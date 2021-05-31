@@ -12,7 +12,8 @@
 
 // 全局变量
 static double winwidth, winheight;   // 窗口尺寸
-
+static int show_more_button=0;//响应mode 切换
+static int show_textbox=0; 
 static int    show_more_buttons = 0; // 显示更多按钮
 
 // 清屏函数，provided in libgraphics
@@ -80,15 +81,15 @@ void Main()
 // 菜单演示程序
 void drawMenu()
 { 
-	static char * menuListFile[] = {"  |文件|  ",  
-		"保存|Ctrl-S", // 快捷键必须采用[Ctrl-X]格式，放在字符串的结尾
-		"新建|Ctrl-N",
-		"退出|Ctrl-E"};
-	static char * menuListExport[] = {"  |导出|  ",
+	static char * menuListFile[] = {"    |文件|            ",  
+		"保存（二进制）    |Ctrl-B", // 快捷键必须采用[Ctrl-X]格式，放在字符串的结尾
+		"保存（文本文件）|Ctrl-T",
+		"退出                        |Ctrl-E"};
+	static char * menuListExport[] = {"   |导出|     ",
 		"图片",
 		"大纲",
 		};
-	static char * menuListHelp[] = {"  |帮助|  ",
+	static char * menuListHelp[] = {"    |帮助|  ",
 		"使用手册",
 		"关于MindSet"};
 	static char * selectedLabel = NULL;
@@ -125,6 +126,7 @@ void drawMenu()
 content：
 part1： 
 **************************************/ 
+ 
 } 
 #endif // #if defined(DEMO_MENU)
 
@@ -137,24 +139,36 @@ void drawButtons()
 	double x = winwidth/30;  
 	double y = winheight/2-h; 
 	double w = winwidth/10; // 控件宽度
-	if (button(GenUIID(0), x, y, w, h, "mode 1"));
+	char*hint="Click Here To Add Text";//输入提示 
 
-	
-	if( show_more_buttons ) {
-		int k;
-		for( k = 0; k<3; k++ ) {
-			char name[128]; sprintf(name, "Button Array %d", k);
-			// use GenUIID(k) to have different ID for multiple buttons by the same code
-			button(GenUIID(k), x + w*1.2, y - k*h*2, w, h, name); 
-		}
 
+	if (button(GenUIID(0), x, y, w, h, "mode 1"))
+    {
+    	show_more_button=1;
+    }
+			//画一个一级父主题 
+	if(show_more_button)
+	{
+		button(GenUIID(0), winwidth/3.5, winheight/1.8, w*1.8, h, hint);
+	    if(button(GenUIID(0), winwidth/3.5, winheight/1.8, w*1.8, h, hint))
+	    {
+	    	show_textbox=1;
+	    }
+	    if(show_textbox)
+	    {
+	        static char memo[80]="Text here";
+	        textbox(GenUIID(0), winwidth/1.5, winheight/15, w*3, h, memo, sizeof(memo));
+	    }
 	}
+	else    ;
+
 
 	if( button(GenUIID(0), x, y-1.5*h, w, h, "mode 2") );
 
 
 	if( button(GenUIID(0), x, y-3*h, w, h, "mode 3") );
 
+	   
 
 }
 #endif // #if defined(DEMO_BUTTON)

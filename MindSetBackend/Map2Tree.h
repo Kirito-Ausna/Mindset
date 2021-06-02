@@ -50,7 +50,12 @@ int FindChildren(PtrTreeNode Parent, PtrTreeNode Children[]);
 void LevelOrderTravelsal(PtrTreeNode Root, void(*DrawChildren)(
     PtrTreeNode Parent, int ChildNum, PtrTreeNode Children[]
 ));// Need to combine with frontend function.DrawChildren is function pointer
-void Tree2File(PtrTreeNode Root, char name[]);
-PtrTreeNode File2Tree(char name[]);
+
+//Save and read, need to input name
+void Tree2BinaryFile(PtrTreeNode Root, char name[]);
+PtrTreeNode BinaryFile2Tree(char name[]);
+void Tree2TxtFile(PtrTreeNode Root, char name[]);
+PtrTreeNode TxtFile2Tree(char name[]);
+
 
 #endif // !__TreeStructure__

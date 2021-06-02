@@ -8,13 +8,25 @@
 #define DEMO_MENU
 #define DEMO_BUTTON
 #define DEMO_MINDMAP
-
+#define MODE_CHOICE
 
 // 全局变量
-static double winwidth, winheight;   // 窗口尺寸
-static int show_more_button=0;//响应mode 切换
-static int show_textbox=0; 
-static int    show_more_buttons = 0; // 显示更多按钮
+static double winwidth, winheight;// 窗口尺寸
+static int switch_button=0;//响应mode 切换
+static int show_textbox=0;
+static int text_edit = 0; //判断是否已经编辑了文本 
+
+void Drawmyson(void)//画一个子主题 
+{
+	DrawLine(1,1);
+}
+void Drawmybrother(void)
+{
+	DrawLine(1,2);
+} 
+
+
+
 
 // 清屏函数，provided in libgraphics
 void DisplayClear(void); 
@@ -34,7 +46,19 @@ void CharEventProcess(char ch)
 // 用户的键盘事件响应函数
 void KeyboardEventProcess(int key, int event)
 {
-	uiGetKeyboard(key,event); // GUI获取键盘
+	switch (event)
+	{
+	case KEY_UP:
+		if (key == VK_TAB)//添加子主题 
+			Drawmyson();
+		display();
+	    if (key == VK_RETURN)//添加同级主题 
+			Drawmybrother();
+			display();
+			break;
+	default:
+		break;
+	}
 	display(); // 刷新显示
 }
 
@@ -48,7 +72,6 @@ void MouseEventProcess(int x, int y, int button, int event)
 // 旋转计时器
 #define MY_ROTATE_TIMER  1
 
- 
 
 // 用户主程序入口
 // 仅初始化执行一次
@@ -67,7 +90,7 @@ void Main()
 
 	// 注册时间响应函数
 	registerCharEvent(CharEventProcess);        // 字符
-	registerKeyboardEvent(KeyboardEventProcess);// 键盘
+	registerKeyboardEvent(KeyboardEventProcess);// 键盘1 
 	registerMouseEvent(MouseEventProcess);      // 鼠标
 
 	// 开启定时器
@@ -121,18 +144,12 @@ void drawMenu()
 	selection = menuList(GenUIID(0),x+2*w,y-h, w, wlist, h, menuListHelp,sizeof(menuListHelp)/sizeof(menuListHelp[0]));
 	if( selection>0 ) selectedLabel = menuListHelp[selection];
 	if( selection==1 ); 
-/**************************************
-接下去是写思维导图的部分 
-content：
-part1： 
-**************************************/ 
  
 } 
 #endif // #if defined(DEMO_MENU)
 
-#if defined(DEMO_BUTTON)
-// 按钮切换模式 Mode 
-void drawButtons()
+#if defined(MODE_CHOICE)//切换选择模式的总函数 
+void ModeChoice()
 {
 	double fH = GetFontHeight();
 	double h = fH*2;  // 控件高度
@@ -140,38 +157,67 @@ void drawButtons()
 	double y = winheight/2-h; 
 	double w = winwidth/10; // 控件宽度
 	char*hint="Click Here To Add Text";//输入提示 
-
-
-	if (button(GenUIID(0), x, y, w, h, "mode 1"))
+	
+    if (button(GenUIID(0), x, y, w, h, "mode 1"))
+   	    switch_button=1;
+    if( button(GenUIID(0), x, y-1.5*h, w, h, "mode 2") )
+   	    switch_button=2;
+    if( button(GenUIID(0), x, y-3*h, w, h, "mode 3") )
+   	    switch_button=3;
+}
+#endif
+void DrawMode1()//画一个一级（根）主题 
+{
+    double fH = GetFontHeight();
+	double h = fH*2;  // 控件高度
+	double x = winwidth/30;  
+	double y = winheight/2-h; 
+	double w = winwidth/10; // 控件宽度
+	char*hint="Click Here To Add Text";//输入提示 
+	
+    if(button(GenUIID(0), winwidth/3.5, winheight/1.8, w*1.8, h, hint))
     {
-    	show_more_button=1;
+    	show_textbox=1;
     }
-			//画一个一级父主题 
-	if(show_more_button)
-	{
-		button(GenUIID(0), winwidth/3.5, winheight/1.8, w*1.8, h, hint);
-	    if(button(GenUIID(0), winwidth/3.5, winheight/1.8, w*1.8, h, hint))
-	    {
-	    	show_textbox=1;
-	    }
-	    if(show_textbox)
-	    {
-	        static char memo[80]="Text here";
-	        textbox(GenUIID(0), winwidth/1.5, winheight/15, w*3, h, memo, sizeof(memo));
-	    }
-	}
-	else    ;
-
-
-	if( button(GenUIID(0), x, y-1.5*h, w, h, "mode 2") );
-
-
-	if( button(GenUIID(0), x, y-3*h, w, h, "mode 3") );
-
-	   
+    if(show_textbox)
+    {
+        static char memoroot[80]="Text here";
+        if(textbox(GenUIID(0), winwidth/1.5, winheight/15, w*3, h, memoroot, sizeof(memoroot)))
+        button(GenUIID(0),winwidth/3.5, winheight/1.8, w*1.8, h, memoroot);
+    }
+}
+void DrawMode2()
+{}
+void DrawMode3()
+{}
+#if defined(DEMO_BUTTON)
+// 按钮切换模式 Mode 
+void DrawModeorigin()
+{
+	double fH = GetFontHeight();
+	double h = fH*2;  // 控件高度
+	double x = winwidth/30;  
+	double y = winheight/2-h; 
+	double w = winwidth/10; // 控件宽度
+	char*hint="Click Here To Add Text";//输入提示 
+    
+    ModeChoice();//选择主题
+	switch(switch_button){
+		case 1:DrawMode1();break;
+		case 2:DrawMode2();break;
+		case 3:DrawMode3();break;
+	} 
 
 }
 #endif // #if defined(DEMO_BUTTON)
+
+
+
+
+
+
+
+
 
 #if defined(DEMO_EDITBOX)
 // 文本编辑演示程序
@@ -223,7 +269,7 @@ void display()
 			
 #if defined(DEMO_BUTTON)
 	// 按钮
-	drawButtons();
+	DrawModeorigin();
 #endif
 
 #if defined(DEMO_EDITBOX)

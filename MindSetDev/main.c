@@ -13,11 +13,19 @@
 // 全局变量
 static double winwidth, winheight;// 窗口尺寸
 static int switch_button=0;//响应mode 切换
-static int show_textbox=0;
-static int text_edit = 0; //判断是否已经编辑了文本 
-
-void Drawmyson(void)//画一个子主题 
+static int isEditing=0;// 判断有没有在编辑文本 
+static int mouse_x=0;
+static int mouse_y=0;
+struct NodeClass Root{
+	height=h;
+    width=w;
+    dx=x, dy=y;
+    color=0;/************这里的color类型有点问题**************/ 
+};
+ 
+void Drawmyson()//画一个子主题 
 {
+	MovePen(mouse_x,mouse_y);
 	DrawLine(1,1);
 }
 void Drawmybrother(void)
@@ -46,6 +54,7 @@ void CharEventProcess(char ch)
 // 用户的键盘事件响应函数
 void KeyboardEventProcess(int key, int event)
 {
+	if(button(GenUIID(0),1,1,1,1,"test"))
 	switch (event)
 	{
 	case KEY_UP:
@@ -65,7 +74,9 @@ void KeyboardEventProcess(int key, int event)
 // 用户的鼠标事件响应函数
 void MouseEventProcess(int x, int y, int button, int event)
 {
-	uiGetMouse(x,y,button,event); //GUI获取鼠标
+	uiGetMouse(x,y,button,event);
+	mouse_x = ScaleXInches(x);
+	mouse_y = ScaleYInches(y);
 	display(); // 刷新显示
 }
 
@@ -78,7 +89,7 @@ void MouseEventProcess(int x, int y, int button, int event)
 void Main() 
 {
 	// 初始化窗口和图形系统
-	SetWindowTitle("MindSet-welcome");
+	SetWindowTitle("MindSet-Welcome");
 	//SetWindowSize(10, 10); // 单位 - 英寸
 	//SetWindowSize(15, 10);
 	//SetWindowSize(10, 20);  // 如果屏幕尺寸不够，则按比例缩小
@@ -117,7 +128,7 @@ void drawMenu()
 		"关于MindSet"};
 	static char * selectedLabel = NULL;
 
-	double fH = GetFontHeight();
+	double fH = GetFontHeight();//fH字体高度 
 	double x = 0; //fH/8;
 	double y = winheight;
 	double h = fH*1.5; // 控件高度
@@ -151,7 +162,7 @@ void drawMenu()
 #if defined(MODE_CHOICE)//切换选择模式的总函数 
 void ModeChoice()
 {
-	double fH = GetFontHeight();
+	double fH = GetFontHeight();//字体高度 
 	double h = fH*2;  // 控件高度
 	double x = winwidth/30;  
 	double y = winheight/2-h; 
@@ -166,24 +177,25 @@ void ModeChoice()
    	    switch_button=3;
 }
 #endif
+
 void DrawMode1()//画一个一级（根）主题 
 {
     double fH = GetFontHeight();
 	double h = fH*2;  // 控件高度
-	double x = winwidth/30;  
-	double y = winheight/2-h; 
-	double w = winwidth/10; // 控件宽度
+	double x = winwidth/3.5;  
+	double y = winheight/1.8; 
+	double w = winwidth*0.18; // 控件宽度
 	char*hint="Click Here To Add Text";//输入提示 
-	
-    if(button(GenUIID(0), winwidth/3.5, winheight/1.8, w*1.8, h, hint))
+	//先建好根节点 6月7号尝试接上去 
+
+    if(button(GenUIID(0), x, y, w, h, hint)&&textbox(GenUIID(0),winwidth/1.2,winheight/3.5,w*1.8,h,"text here",Root.content))
     {
-    	show_textbox=1;
+    	isEditing = 1;
     }
-    if(show_textbox)
+    if(isEditing)
     {
-        static char memoroot[80]="Text here";
-        if(textbox(GenUIID(0), winwidth/1.5, winheight/15, w*3, h, memoroot, sizeof(memoroot)))
-        button(GenUIID(0),winwidth/3.5, winheight/1.8, w*1.8, h, memoroot);
+    	CreateTree(0,NodeObject); 
+		button(GenUIID(0),winwidth/3.5, winheight/1.8, w*1.8, h, Root.content);   
     }
 }
 void DrawMode2()

@@ -4,7 +4,7 @@ Name=MindSet
 Type=0
 Ver=2
 ObjFiles=
-Includes=D:\Course\MindSet\Mindset\MindSetDev\libgraphics;D:\Course\MindSet\Mindset\MindSetDev\simpleGUI;D:\Course\MindSet\Mindset\MindSetBackend
+Includes=D:\Course\MindSet\Mindset\MindSetDev\libgraphics;D:\Course\MindSet\Mindset\MindSetDev\simpleGUI;D:\Course\MindSet\Mindset\MindSetDev\MindSetBackend
 Libs=
 PrivateResource=
 ResourceIncludes=
@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000001000000
-UnitCount=22
+UnitCount=23
 
 [VersionInfo]
 Major=1
@@ -261,17 +261,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit23]
-FileName=themebutton.h
-CompileCpp=0
-Folder=button
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit21]
-FileName=..\MindSetBackend\Map2Tree.c
+FileName=MindSetBackend\Map2Tree.h
 CompileCpp=0
 Folder=MindSetBackend
 Compile=1
@@ -281,9 +271,19 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit22]
-FileName=..\MindSetBackend\Map2Tree.h
+FileName=MindSetBackend\Map2Tree.c
 CompileCpp=0
 Folder=MindSetBackend
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit21]
+FileName=themebutton\themebutton.c
+CompileCpp=0
+Folder=button
 Compile=1
 Link=1
 Priority=1000

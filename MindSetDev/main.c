@@ -4,6 +4,8 @@
 #include "extgraph.h"
 #include "imgui.h"
 #include "linkedlist.h"
+#include "Map2Tree.h"
+#include <stdio.h>
 
 #define DEMO_MENU
 #define DEMO_BUTTON
@@ -11,39 +13,65 @@
 #define MODE_CHOICE
 
 // 全局变量
-static double winwidth, winheight;// 窗口尺寸
+static double winwidth=15, winheight=10;// 窗口尺寸
 static int switch_button=0;//响应mode 切换
 static int isEditing=0;// 判断有没有在编辑文本 
-static int mouse_x=0;
-static int mouse_y=0;
-struct NodeClass Root{
-	height=h;
-    width=w;
-    dx=x, dy=y;
-    color=0;/************这里的color类型有点问题**************/ 
-};
- 
-void Drawmyson()//画一个子主题 
+double mouse_x=0;
+double mouse_y=0;
+char*hint="Text here";
+double fH = 0.2;
+double h = 0.4;  // 控件高度
+double x = 5;  
+double y = 2; 
+double w = 2.2; // 控件宽度
+struct NodeClass Father={0.4,2.2,5,2,0};
+PtrTreeNode root;
+PtrTreeNode Children[10];
+int ChildrenNum;
+int idnum=0;
+
+
+
+
+
+DrawChildren(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 {
-	MovePen(mouse_x,mouse_y);
-	DrawLine(1,1);
+	double fatherx=Parent->NodeObject.dx+w+0.1;
+	double fatherydw=Parent->NodeObject.dy+fH/2+ChildrenNum/2*h*1.3;
+	MovePen(Parent->NodeObject.dx+w,Parent->NodeObject.dy+fH);
+	int i=1;
+	SetPenColor("Dark Gray");
+	if(ChildNum%2!=0)
+	{
+		DrawLine(0.2,0);
+		MovePen(fatherx,fatherydw);
+	}
+	else
+	{
+		DrawLine(0.1,0);
+		MovePen(fatherx,fatherydw-fH);
+	}
+		double move_x=GetCurrentX();
+		double move_y=GetCurrentY();
+		for(i=0;i<ChildrenNum-1;i++)
+		{
+			DrawLine(0.1,0);
+			if(button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i].content)+0.2,h,Children[i].content));
+			MovePen(fatherx,move_y);
+			DrawLine(0,-h*1.3);
+			move_x=GetCurrentX;
+			move_y=GetCurrentY;
+		}
+		DrawLine(0.1,0);
+		if(button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i].content)+0.2,h,Children[i].content));
+	}
 }
-void Drawmybrother(void)
-{
-	DrawLine(1,2);
-} 
-
-
-
-
 // 清屏函数，provided in libgraphics
 void DisplayClear(void); 
 // 计时器启动函数，provided in libgraphics
 void startTimer(int id,int timeinterval);
-
 // 用户的显示函数
 void display(void); 
-
 // 用户的字符事件响应函数
 void CharEventProcess(char ch)
 {
@@ -54,18 +82,45 @@ void CharEventProcess(char ch)
 // 用户的键盘事件响应函数
 void KeyboardEventProcess(int key, int event)
 {
-	if(button(GenUIID(0),1,1,1,1,"test"))
+	double move_x=GetCurrentX();
+	double move_y=GetCurrentY();
 	switch (event)
 	{
-	case KEY_UP:
-		if (key == VK_TAB)//添加子主题 
-			Drawmyson();
-		display();
-	    if (key == VK_RETURN)//添加同级主题 
-			Drawmybrother();
-			display();
+    	case KEY_UP:
+	    	if (key == VK_TAB)//添加子主题 
+	    	    {
+	    	        PtrTreeNode TargetNode=LocateNode(move_x,move_y,root);
+	    	        if(TargetNode!=NULL)
+					{
+					    ChildrenNum=FindChildren(TargetNode,Children);
+	    	            InsertTreeNode(TargetNode,0,ChildrenNum,TargetNode->NodeObject);
+		    	        LevelOrderTravelsal(root, DrawChildren);
+		    	        idnum++;
+		    	    }
+		            display();
+		        }
+	        if (key == VK_RETURN)//添加同级主题 
+			    {
+			        PtrTreeNode TargetNode=LocateNode(move_x,move_y,root);
+			        if(TargetNode!=NULL)
+					{
+					    ChildrenNum=FindChildren(TargetNode,Children);
+			            InsertTreeNode(TargetNode,1,idnum,TargetNode->NodeObject);
+			            LevelOrderTravelsal(root, DrawChildren);
+			            idnum++;
+			        }
+			        display();
+			    }
+			if (key == VK_RETURN)
+			    {
+			    	PtrTreeNode TargetNode=LocateNode(move_x,move_y,root);
+			    	if(TargetNode!=NULL)
+			    	{
+			    		DeleteTree(TargetNode);
+			    	}
+			    }
 			break;
-	default:
+	    default:
 		break;
 	}
 	display(); // 刷新显示
@@ -74,15 +129,9 @@ void KeyboardEventProcess(int key, int event)
 // 用户的鼠标事件响应函数
 void MouseEventProcess(int x, int y, int button, int event)
 {
-	uiGetMouse(x,y,button,event);
-	mouse_x = ScaleXInches(x);
-	mouse_y = ScaleYInches(y);
+	uiGetMouse(x, y, button, event); // needed for using simpleGUI
 	display(); // 刷新显示
 }
-
-// 旋转计时器
-#define MY_ROTATE_TIMER  1
-
 
 // 用户主程序入口
 // 仅初始化执行一次
@@ -101,7 +150,7 @@ void Main()
 
 	// 注册时间响应函数
 	registerCharEvent(CharEventProcess);        // 字符
-	registerKeyboardEvent(KeyboardEventProcess);// 键盘1 
+	registerKeyboardEvent(KeyboardEventProcess);// 键盘 
 	registerMouseEvent(MouseEventProcess);      // 鼠标
 
 	// 开启定时器
@@ -162,133 +211,55 @@ void drawMenu()
 #if defined(MODE_CHOICE)//切换选择模式的总函数 
 void ModeChoice()
 {
-	double fH = GetFontHeight();//字体高度 
-	double h = fH*2;  // 控件高度
-	double x = winwidth/30;  
-	double y = winheight/2-h; 
-	double w = winwidth/10; // 控件宽度
-	char*hint="Click Here To Add Text";//输入提示 
-	
     if (button(GenUIID(0), x, y, w, h, "mode 1"))
    	    switch_button=1;
     if( button(GenUIID(0), x, y-1.5*h, w, h, "mode 2") )
    	    switch_button=2;
     if( button(GenUIID(0), x, y-3*h, w, h, "mode 3") )
    	    switch_button=3;
+   	    
+   	switch(switch_button){
+		case 1:DrawMode1();break;
+		case 2:DrawMode2();break;
+		case 3:DrawMode3();break;
+	} 
 }
 #endif
 
 void DrawMode1()//画一个一级（根）主题 
 {
-    double fH = GetFontHeight();
-	double h = fH*2;  // 控件高度
-	double x = winwidth/3.5;  
-	double y = winheight/1.8; 
-	double w = winwidth*0.18; // 控件宽度
+	double tbx=winwidth/1.2;
+	double tby=winheight/3.5;
+	double tbw=w*1.8;
+	double tbh=h; 
 	char*hint="Click Here To Add Text";//输入提示 
-	//先建好根节点 6月7号尝试接上去 
-
-    if(button(GenUIID(0), x, y, w, h, hint)&&textbox(GenUIID(0),winwidth/1.2,winheight/3.5,w*1.8,h,"text here",Root.content))
+    if(button(GenUIID(0), x, y, w, h, hint)&&textbox(GenUIID(0),tbx,tby,tbw,tbh,"text here",hint))
     {
     	isEditing = 1;
     }
     if(isEditing)
     {
-    	CreateTree(0,NodeObject); 
-		button(GenUIID(0),winwidth/3.5, winheight/1.8, w*1.8, h, Root.content);   
+    	CreateTree(0,Father);
+		EditContent(root,hint);   
     }
 }
 void DrawMode2()
-{}
+{
+
+}
 void DrawMode3()
 {}
-#if defined(DEMO_BUTTON)
-// 按钮切换模式 Mode 
-void DrawModeorigin()
-{
-	double fH = GetFontHeight();
-	double h = fH*2;  // 控件高度
-	double x = winwidth/30;  
-	double y = winheight/2-h; 
-	double w = winwidth/10; // 控件宽度
-	char*hint="Click Here To Add Text";//输入提示 
-    
-    ModeChoice();//选择主题
-	switch(switch_button){
-		case 1:DrawMode1();break;
-		case 2:DrawMode2();break;
-		case 3:DrawMode3();break;
-	} 
-
-}
-#endif // #if defined(DEMO_BUTTON)
 
 
 
 
 
-
-
-
-
-#if defined(DEMO_EDITBOX)
-// 文本编辑演示程序
-void drawEditText()
-{
-	static char firstName[80] = "Xinguo";
-	static char lastName[80] = "Liu";
-	static char results[200] = "";
-	static char memo[80]="Hello World! Edit me!";
-	static char numstr[80] = "3.14159265";
-	static char newnum[80] = "";
-	double fH = GetFontHeight();
-	double h = fH*2; // 控件高度
-	double w = winwidth/4; // 控件宽度
-	double x = winwidth/2.5;
-	double y = winheight/2-h;
-
-	textbox(GenUIID(0), winwidth / 10, winheight-h-h, w, h, memo, sizeof(memo));
-	textbox(GenUIID(0), x, y, w, h, memo, sizeof(memo));
-
-	SetPenColor("Brown"); 
-	drawLabel(x-fH/2-TextStringWidth("名"), (y-=h*1.2)+fH*0.7, "名");
-	if( textbox(GenUIID(0), x, y, w, h, firstName, sizeof(firstName)) )
-		sprintf(results,"Text edit result is: %s+%s", firstName,lastName);
-
-	SetPenColor("Brown"); 
-	drawLabel(x-fH/2-TextStringWidth("姓"), (y-=h*1.2)+fH*0.7, "姓");
-	if( textbox(GenUIID(0), x, y, w, h, lastName, sizeof(lastName)) )
-		sprintf(results,"Text edit result is: %s+%s", firstName,lastName);
-
-	SetPenColor("Gray"); 
-	drawLabel(x, y-=fH*1.2, results);
-
-	//y = winheight/2;
-	if( textbox(GenUIID(0),x,y-=h*1.8,w,h,numstr,sizeof(numstr)) )
-	{
-		double value; sscanf(numstr,"%lf",&value);
-		sprintf(newnum,"Represented value is: %.20f", value);
-	}
-	SetPenColor("Gray"); 
-	drawLabel(x,y-=fH*1.2, newnum);
-}
-#endif // #if defined(DEMO_EDITBOX)
 
 void display()
 {
 	// 清屏
 	DisplayClear();
-			
-#if defined(DEMO_BUTTON)
-	// 按钮
-	DrawModeorigin();
-#endif
-
-#if defined(DEMO_EDITBOX)
-	// 编辑文本字符串
-	drawEditText();
-#endif
-
+	ModeChoice();
 #if defined(DEMO_MENU)
 	// 绘制和处理菜单
 	drawMenu();

@@ -35,16 +35,21 @@ PtrTreeNode LocateNode(double x, double y, PtrTreeNode root){
 }
 
 void EditContent(PtrTreeNode node, char value[]){
-    strcpy(node->Content, value);
+    if(node != NULL)
+        strcpy(node->Content, value);
 }
 
 void EditCoordinate(PtrTreeNode node, double x, double y){
-    node->NodeObject.dx = x;
-    node->NodeObject.dx = y;
+    if(node != NULL){
+        node->NodeObject.dx = x;
+        node->NodeObject.dx = y;
+    }
 }
 
 void FreeNode(PtrTreeNode node){
-    free(node);
+    if(node != NULL){
+        free(node);
+    }
 }
 
 void DeleteTree(PtrTreeNode subtree){
@@ -62,33 +67,48 @@ void DeleteTree(PtrTreeNode subtree){
 
 PtrTreeNode InsertTreeNode(PtrTreeNode ChosedNode, int relation, int NodeNum, struct NodeClass NodeObject)
 {
-    if(relation == 0)// define inserting a child or next level node
-    {// insert a child
-        PtrTreeNode fisrtchild = ChosedNode->FirstChild;
-        ChosedNode->FirstChild = CreateTree(NodeNum,NodeObject);
-        ChosedNode->FirstChild->NextSibling = fisrtchild;
-        return ChosedNode->FirstChild;
-    }else{
-        while (ChosedNode->NextSibling != NULL)
-        {
-            ChosedNode = ChosedNode->NextSibling;
+    if(ChosedNode != NULL){
+        if(relation == 0)// define inserting a child or next level node
+        {// insert a child
+            PtrTreeNode fisrtchild = ChosedNode->FirstChild;
+            ChosedNode->FirstChild = CreateTree(NodeNum,NodeObject);
+            ChosedNode->FirstChild->NextSibling = fisrtchild;
+            return ChosedNode->FirstChild;
+        }else{// insert a sibling
+            while (ChosedNode->NextSibling != NULL)
+            {
+                ChosedNode = ChosedNode->NextSibling;
+            }
+            if(ChosedNode != Root)
+            {
+                ChosedNode->NextSibling = CreateTree(NodeNum,NodeObject);
+                return ChosedNode->NextSibling;
+            }else{
+                return NULL; // Can't insert a sibling for the Root
+            }
         }
-        ChosedNode->NextSibling = CreateTree(NodeNum,NodeObject);
-        return ChosedNode->NextSibling;
+    }else{
+        return NULL;// insertion failed
     }
 }
 
 int FindChildren(PtrTreeNode Parent, PtrTreeNode Children[]){
     int ChildNum = 0;
-    PtrTreeNode Child = Parent->FirstChild;
-    while (Child)
-    {
-        Children[ChildNum] = Child;
-        ChildNum++;
-        Child = Child->NextSibling;
+    PtrTreeNode Child;
+    if(Parent != NULL){
+        Child = Parent->FirstChild;
+        while (Child)
+        {
+            Children[ChildNum] = Child;
+            ChildNum++;
+            Child = Child->NextSibling;
+        }
+        // Child = Parent->FirstChild;
+        return ChildNum;
+    }else{
+        return -1;// Find failed, Parent doesn't exit.
     }
-    Child = Parent->FirstChild;
-    return ChildNum;
+    
 }
 
 void InitalQueue(){

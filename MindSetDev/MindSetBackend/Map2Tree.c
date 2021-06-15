@@ -201,7 +201,8 @@ PtrTreeNode BinaryFile2Tree(char name[]){
             *(Root->FirstChild) = Children[0];
             q_push(Root->FirstChild);
             PtrTreeNode Child = Root->FirstChild;
-            for(int i = 1;i<num_children;i++){
+            int i=1;
+            for(i = 1;i<num_children;i++){
                 Child->NextSibling = (PtrTreeNode)malloc(sizeof(struct TreeNode));
                 q_push(Root->NextSibling);
                 *(Child->NextSibling) = Children[i];
@@ -234,7 +235,8 @@ void Tree2TxtFile(PtrTreeNode Root, char name[]){
             Child = Child->NextSibling;
         }
         fprintf(fin, "%d\n", num_child);
-        for(int i=0;i<num_child;i++){
+        int i=0;
+        for(i=0;i<num_child;i++){
             fprintf(fin, "%d %lf %lf %lf %lf %d %s\n",Children[i].NodeNumber,
             Children[i].NodeObject.height, Children[i].NodeObject.width, Children[i].NodeObject.dx, Children[i].NodeObject.dy,
             Children[i].NodeObject.color,Children[i].Content);
@@ -258,7 +260,8 @@ PtrTreeNode TxtFile2Tree(char name[]){
         int num_children;
         fscanf(fout, "%d", &num_children);
         if(num_children != 0){
-           for(int i=0;i<num_children;i++){
+        	int i=0;
+           for(i=0;i<num_children;i++){
             fscanf(fout, "%d %lf %lf %lf %lf %d %s",&Children[i].NodeNumber,
             &Children[i].NodeObject.height, &Children[i].NodeObject.width, &Children[i].NodeObject.dx, &Children[i].NodeObject.dy,
             &Children[i].NodeObject.color,Children[i].Content);
@@ -267,7 +270,7 @@ PtrTreeNode TxtFile2Tree(char name[]){
             *(Root->FirstChild) = Children[0];
             q_push(Root->FirstChild);
             PtrTreeNode Child = Root->FirstChild;
-            for(int i = 1;i<num_children;i++){
+            for(i = 1;i<num_children;i++){
                 Child->NextSibling = (PtrTreeNode)malloc(sizeof(struct TreeNode));
                 q_push(Root->NextSibling);
                 *(Child->NextSibling) = Children[i];

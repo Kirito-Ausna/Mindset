@@ -11,6 +11,7 @@ PtrTreeNode CreateTree(int NodeNum, struct NodeClass NodeObject){
     root->NodeNumber = NodeNum;
     root->FirstChild = NULL;
     root->NextSibling = NULL;
+    Root = root;
     return root;
 }
 

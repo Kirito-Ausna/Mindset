@@ -62,29 +62,8 @@ void drawMenu()
 } 
 #endif // #if defined(DEMO_MENU)
 
-//切换选择模式的总函数 
-void ModeChoice()
-{
-	double fH=GetFontHeight();
-	double h = fH*2; // 控件高度
-	double x = winwidth/30;
-	double y = winheight/2-h;
-	double w = TextStringWidth("mode 1")*2; // 控件宽度
-    if (button(GenUIID(0), x, y, w, h, "mode 1"))
-   	    switch_button=1;
-    if( button(GenUIID(0), x, y-1.5*h, w, h, "mode 2") )
-   	    switch_button=2;
-    if( button(GenUIID(0), x, y-3*h, w, h, "mode 3") )
-   	    switch_button=3;
-   	    
-   switch(switch_button){
-		case 1:DrawMode1();break;
-		case 2:DrawMode2();break;
-		case 3:DrawMode3();break;
-	}
-}
 
-void DrawMode1()//画一个一级（根）主题 
+/*void DrawMode1()//画一个一级（根）主题 
 {
 	double x=winwidth/3.5;
 	double y=winheight/1.8;
@@ -114,7 +93,7 @@ void DrawMode1()//画一个一级（根）主题
 void DrawMode2()
 {}
 void DrawMode3()
-{}
+{}*/
 
 void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 {
@@ -123,62 +102,105 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 	double w=winwidth/10;
 	double fH=GetFontHeight();
 	double h=fH*2;
-	static char memoroot[80]="Text Here"; 
-	static char*hint="Click Here To Add Text";//输入提示 
-	
-	double fatherx=Parent->NodeObject.dx+w+0.1;
-	double fatherydw=Parent->NodeObject.dy+fH/2+ChildNum/2*h*1.3;
-	MovePen(Parent->NodeObject.dx+w,Parent->NodeObject.dy+fH);
-	int i=1;
-	SetPenColor("Dark Gray");
+	static char memoroot[80]="Click To Start"; //输入提示 
+	//draw the root 
 	if(Parent==NULL)
 	{
-        if(button(GenUIID(0), x, y, w*1.8, h, hint))
+        if(button(GenUIID(0), x, y, w*1.8, h, memoroot))//draw the button first
         {
     	     isEditing=1;
         }
-        if(isEditing==1)
+        if(isEditing)
         {
-    	    textbox(GenUIID(0),winwidth/1.5,winheight/15,w*3,h,memoroot,sizeof(memoroot));
-		    root->NodeNumber=0;
+        	static char mroot[80]="Text Here";
+    	    textbox(GenUIID(0),winwidth/1.5,winheight/15,w*3,h,mroot,sizeof(mroot));//ready for content adding
+		    root->NodeNumber=0;//initinalization. root is a global variable defined in draw.h
 		    root->NodeObject.height=h;
 		    root->NodeObject.width=w;
 		    root->NodeObject.dx=x;
 		    root->NodeObject.dy=y;
 		    root->NodeObject.color=0;
-		    button(GenUIID(0), x, y, w*1.8, h, memoroot);
-    	    CreateTree(0,root->NodeObject);
-		    EditContent(root,memoroot);
-        }
-	}
-	if(ChildNum%2!=0)
-	{
-		DrawLine(0.2,0);
-		MovePen(fatherx,fatherydw);
-	}
-	else
-	{
-		DrawLine(0.1,0);
-		MovePen(fatherx,fatherydw-fH);
-	}
-		double move_x=GetCurrentX();
-		double move_y=GetCurrentY();
-		for(i=0;i<ChildNum-1;i++)
-		{
-			DrawLine(0.1,0);
-			if(button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i]->Content)+0.2,h,Children[i]->Content));
-			EditCoordinate(Children[i],move_x+0.1,move_y-0.5*h);
-			MovePen(fatherx,move_y);
-			DrawLine(0,-h*1.3);
-			move_x=GetCurrentX();
-			move_y=GetCurrentY();
+		    root->FirstChild=NULL;
+		    root->NextSibling=NULL;
+		    button(GenUIID(0), x, y, w*1.8, h, mroot);//Actually,there are two buttons here!Thankfully,they are the same.
+    	    CreateTree(0,root->NodeObject);//give it to the backend
+		    EditContent(root,mroot);//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend    
 		}
-		DrawLine(0.1,0);
-		if(button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i]->Content)+0.2,h,Children[i]->Content));
-		EditCoordinate(Children[i],move_x+0.1,move_y-0.5*h);
-		display();
+	}
+	else//draw the children
+	{
+	    double fatherx=Parent->NodeObject.dx+w+0.1;
+	    double fatherydw=Parent->NodeObject.dy+fH/2+ChildNum/2*h*1.3;
+	    MovePen(Parent->NodeObject.dx+w,Parent->NodeObject.dy+fH);
+	    int i;
+	    SetPenColor("Dark Gray");
+	    if(ChildNum%2!=0)
+	    {
+		    DrawLine(0.2,0);
+		    MovePen(fatherx,fatherydw);
+	    }
+	    else
+	    {
+		    DrawLine(0.1,0);
+		    MovePen(fatherx,fatherydw-fH);
+	    }
+		    double move_x=GetCurrentX();
+		    double move_y=GetCurrentY();
+		    for(i=0;i<ChildNum-1;i++)
+		    {
+			    DrawLine(0.1,0);
+			    if(button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i]->Content)+0.2,h,Children[i]->Content));
+			    EditCoordinate(Children[i],move_x+0.1,move_y-0.5*h);//when inserting or deleting, every child's coordinate is supposed to be changed 
+				Children[i]->NodeObject.height=h;
+				Children[i]->NodeObject.width=TextStringWidth(Children[i]->Content)+0.2;
+				Children[i]->NodeObject.dx=move_x+0.1;
+				Children[i]->NodeObject.dy=move_y-0.5*h;
+				Children[i]->NodeObject.color=0;
+				MovePen(fatherx,move_y);
+			    DrawLine(0,-h*1.3);
+			    move_x=GetCurrentX();
+			    move_y=GetCurrentY();
+		    }
+		    DrawLine(0.1,0);
+		    if(button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i]->Content)+0.2,h,Children[i]->Content));
+		    EditCoordinate(Children[i],move_x+0.1,move_y-0.5*h);
+		    Children[i]->NodeObject.height=h;
+			Children[i]->NodeObject.width=TextStringWidth(Children[i]->Content)+0.2;
+			Children[i]->NodeObject.dx=move_x+0.1;
+			Children[i]->NodeObject.dy=move_y-0.5*h;
+			Children[i]->NodeObject.color=0;
+	}
 }
 
+void DrawChildren2(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
+{
+}
+void DrawChildren3(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
+{
+}
+
+
+//切换选择模式的总函数 
+void ModeChoice()
+{
+	double fH=GetFontHeight();
+	double h = fH*2; // 控件高度
+	double x = winwidth/30;
+	double y = winheight/2-h;
+	double w = TextStringWidth("mode 1")*2; // 控件宽度
+    if (button(GenUIID(0), x, y, w, h, "mode 1"))
+   	    switch_button=1;
+    if( button(GenUIID(0), x, y-1.5*h, w, h, "mode 2") )
+   	    switch_button=2;
+    if( button(GenUIID(0), x, y-3*h, w, h, "mode 3") )
+   	    switch_button=3;
+   	    
+   switch(switch_button){
+		case 1:DrawChildren1(NULL,1,Children);break;
+		case 2:DrawChildren2(NULL,1,Children);break;
+		case 3:DrawChildren3(NULL,1,Children);break;
+	}
+}
 
 // 清屏函数，provided in libgraphics
 void DisplayClear(void); 
@@ -197,44 +219,42 @@ void CharEventProcess(char ch)
 // 用户的键盘事件响应函数
 void KeyboardEventProcess(int key, int event)
 {
+	display();
 	uiGetKeyboard(key,event);
-	double move_x=GetCurrentX();
-	double move_y=GetCurrentY();
-	PtrTreeNode yf; 
+	PtrTreeNode yf=NULL; 
+	static char memochild[30]="Text Here";
+	PtrTreeNode TargetNode=NULL;
 	switch (event)
 	{
     	case KEY_UP:
-	    	if (key == VK_F1)//添加子主题 
+	    	if (key == VK_F1)//添加子主题(why not TAB? has been used) 
 	    	    {
-	    	        PtrTreeNode TargetNode=LocateNode(move_x,move_y,root);
+	    	    	double move_x=GetCurrentX();
+	                double move_y=GetCurrentY();
+	    	        TargetNode=LocateNode(move_x,move_y,root);//temporary varible
 	    	        if(TargetNode!=NULL)
 					{
-					    ChildrenNum=FindChildren(TargetNode,Children);
-	    	            yf = InsertTreeNode(TargetNode,0,ChildrenNum,TargetNode->NodeObject);
-	    	            static char memochild[30]="Text Here";
-	    	            textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,winwidth/15,memochild,sizeof(memochild));
-	    	            EditContent(yf,memochild);
-	    	            display();
-	    	            switch(switch_button=1) 
+						ChildrenNum=FindChildren(TargetNode,Children);
+	    	            yf = InsertTreeNode(TargetNode,0,idnum,TargetNode->NodeObject);
+	    	            DrawChildren1(root,ChildrenNum,Children);
+						/*switch(switch_button) 
 		    	        {
 		    	            case 1:LevelOrderTravelsal(root, DrawChildren1);break;
 		    	            //case 2:LevelOrderTravelsal(root, DrawChildren2);break;
 		    	            //case 3:LevelOrderTravelsal(root, DrawChildren3);break;
 		    	        }
-		    	        idnum++;
+		    	        idnum++;*/
 		    	    }
 		        }
 	        if (key == VK_F2)//添加同级主题 
 			    {
-			        PtrTreeNode TargetNode=LocateNode(move_x,move_y,root);
+			    	double move_x=GetCurrentX();
+	                double move_y=GetCurrentY();
+			        TargetNode=LocateNode(move_x,move_y,root);
 			        if(TargetNode!=NULL)
 					{
 					    ChildrenNum=FindChildren(TargetNode,Children);
 			            yf = InsertTreeNode(TargetNode,1,idnum,TargetNode->NodeObject);
-			            static char memochild[30]="Text Here";
-			            textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,winwidth/15,memochild,sizeof(memochild)); 
-			            EditContent(yf,memochild);
-			            display();
 	    	            switch(switch_button) 
 		    	        {
 		    	            case 1:LevelOrderTravelsal(root, DrawChildren1);break;
@@ -246,11 +266,12 @@ void KeyboardEventProcess(int key, int event)
 			    }
 			if (key == VK_F3)//删除一个主题 
 			    {
-			    	PtrTreeNode TargetNode=LocateNode(move_x,move_y,root);
+			    	double move_x=GetCurrentX();
+	                double move_y=GetCurrentY();
+			    	TargetNode=LocateNode(move_x,move_y,root);
 			    	if(TargetNode!=NULL)
 			    	{
-			    		DeleteTree(TargetNode);
-			    		display();//刷新显示 
+			    		DeleteTree(TargetNode); 
 			    		switch(switch_button) 
 		    	        {
 		    	            case 1:LevelOrderTravelsal(root, DrawChildren1);break;
@@ -259,11 +280,16 @@ void KeyboardEventProcess(int key, int event)
 		    	        }
 			    	}
 			    }
+			if (key == VK_F4)//edit part (for test)
+			{
+				textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,winwidth/15,memochild,sizeof(memochild));
+				EditContent(root,memochild);
+				drawLabel(winwidth/1.5,winheight/20,"Success!Go On~");
+			}
 			break;
 	    default:
 		break;
-	}
-	display(); 
+	} 
 }
 
 // 用户的鼠标事件响应函数
@@ -278,6 +304,7 @@ void MouseEventProcess(int x, int y, int button, int event)
 		static char memochild[30]="Text Here";
 		textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,winwidth/15,memochild,sizeof(memochild));
 		EditContent(TargetNode,memochild);
+		TargetNode->NodeObject.width=TextStringWidth(memochild);
 	}
 	display(); //刷新显示 
 }

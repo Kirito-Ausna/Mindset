@@ -1,6 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<Map2Tree.h>
+#include"Map2Tree.h"
 #include<string.h>
 
 PtrTreeNode CreateTree(int NodeNum, struct NodeClass NodeObject){
@@ -302,3 +302,18 @@ PtrTreeNode TxtFile2Tree(char name[]){
     }
     return R;
 }
+
+// int main(void){
+//     struct NodeClass tmp;
+//     tmp.color = 0;
+//     tmp.dx = 2;
+//     tmp.dy = 2;
+//     tmp.height = 10;
+//     tmp.width = 10;
+
+//     PtrTreeNode Root = CreateTree(0, tmp);
+//     PtrTreeNode Toolman = LocateNode(10,10, Root);
+//     EditContent(Toolman,"Test!");
+//     printf("%d %s",Toolman->NodeNumber,Toolman->Content);
+//     return 0;
+// }

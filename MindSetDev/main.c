@@ -62,39 +62,6 @@ void drawMenu()
 } 
 #endif // #if defined(DEMO_MENU)
 
-
-/*void DrawMode1()//画一个一级（根）主题 
-{
-	double x=winwidth/3.5;
-	double y=winheight/1.8;
-	double w=winwidth/10;
-	double fH=GetFontHeight();
-	double h=fH*2;
-	static char memoroot[80]="Text Here"; 
-	static char*hint="Click Here To Add Text";//输入提示 
-    if(button(GenUIID(0), x, y, w*1.8, h, hint))
-    {
-    	isEditing=1;
-    }
-    if(isEditing==1)
-    {
-    	textbox(GenUIID(0),winwidth/1.5,winheight/15,w*3,h,memoroot,sizeof(memoroot));
-		root->NodeNumber=0;
-		root->NodeObject.height=h;
-		root->NodeObject.width=w;
-		root->NodeObject.dx=x;
-		root->NodeObject.dy=y;
-		root->NodeObject.color=0;
-		button(GenUIID(0), x, y, w*1.8, h, memoroot);
-    	CreateTree(0,root->NodeObject);
-		EditContent(root,memoroot);
-    }
-}
-void DrawMode2()
-{}
-void DrawMode3()
-{}*/
-
 void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 {
     double x=winwidth/3.5;
@@ -114,17 +81,17 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
         {
         	static char mroot[80]="Text Here";
     	    textbox(GenUIID(0),winwidth/1.5,winheight/15,w*3,h,mroot,sizeof(mroot));//ready for content adding
-		    root->NodeNumber=0;//initinalization. root is a global variable defined in draw.h
+    	    root = CreateTree(0,root->NodeObject);//give it to the backend
+    	    EditContent(root,mroot);//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend
+		    root->NodeNumber = 0;//initinalization. root is a global variable defined in draw.h
 		    root->NodeObject.height=h;
-		    root->NodeObject.width=w;
+		    root->NodeObject.width=w*1.8;
 		    root->NodeObject.dx=x;
 		    root->NodeObject.dy=y;
 		    root->NodeObject.color=0;
 		    root->FirstChild=NULL;
 		    root->NextSibling=NULL;
-		    button(GenUIID(0), x, y, w*1.8, h, mroot);//Actually,there are two buttons here!Thankfully,they are the same.
-    	    CreateTree(0,root->NodeObject);//give it to the backend
-		    EditContent(root,mroot);//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend    
+		    button(GenUIID(0), x, y, w*1.8, h, mroot);//Actually,there are two buttons here!Thankfully,they are the same.    
 		}
 	}
 	else//draw the children
@@ -205,7 +172,7 @@ void ModeChoice()
 // 清屏函数，provided in libgraphics
 void DisplayClear(void); 
 // 计时器启动函数，provided in libgraphics
-void startTimer(int id,int timeinterval);
+//void startTimer(int id,int timeinterval);
 // 用户的显示函数
 void display(void); 
 
@@ -218,25 +185,27 @@ void CharEventProcess(char ch)
 
 // 用户的键盘事件响应函数
 void KeyboardEventProcess(int key, int event)
-{
-	display();
+{  
+    display();
 	uiGetKeyboard(key,event);
 	PtrTreeNode yf=NULL; 
 	static char memochild[30]="Text Here";
 	PtrTreeNode TargetNode=NULL;
 	switch (event)
 	{
-    	case KEY_UP:
-	    	if (key == VK_F1)//添加子主题(why not TAB? has been used) 
+    	case KEY_UP:	
+		if (key == VK_F1)//添加子主题(why not TAB? -has been used) 
 	    	    {
+	    	    	drawLabel(winwidth/1.5,winheight/22,"Hello World!");
 	    	    	double move_x=GetCurrentX();
 	                double move_y=GetCurrentY();
 	    	        TargetNode=LocateNode(move_x,move_y,root);//temporary varible
+	    	        
 	    	        if(TargetNode!=NULL)
 					{
 						ChildrenNum=FindChildren(TargetNode,Children);
 	    	            yf = InsertTreeNode(TargetNode,0,idnum,TargetNode->NodeObject);
-	    	            DrawChildren1(root,ChildrenNum,Children);
+	    	            LevelOrderTravelsal(root,DrawChildren1);
 						/*switch(switch_button) 
 		    	        {
 		    	            case 1:LevelOrderTravelsal(root, DrawChildren1);break;
@@ -244,6 +213,7 @@ void KeyboardEventProcess(int key, int event)
 		    	            //case 3:LevelOrderTravelsal(root, DrawChildren3);break;
 		    	        }
 		    	        idnum++;*/
+		    	        drawLabel(winwidth/1.5,winheight/22,"Hello World!");
 		    	    }
 		        }
 	        if (key == VK_F2)//添加同级主题 
@@ -253,6 +223,8 @@ void KeyboardEventProcess(int key, int event)
 			        TargetNode=LocateNode(move_x,move_y,root);
 			        if(TargetNode!=NULL)
 					{
+						DisplayClear();
+	                    //清屏
 					    ChildrenNum=FindChildren(TargetNode,Children);
 			            yf = InsertTreeNode(TargetNode,1,idnum,TargetNode->NodeObject);
 	    	            switch(switch_button) 
@@ -271,6 +243,8 @@ void KeyboardEventProcess(int key, int event)
 			    	TargetNode=LocateNode(move_x,move_y,root);
 			    	if(TargetNode!=NULL)
 			    	{
+			    		DisplayClear();
+	                    //清屏
 			    		DeleteTree(TargetNode); 
 			    		switch(switch_button) 
 		    	        {
@@ -282,9 +256,8 @@ void KeyboardEventProcess(int key, int event)
 			    }
 			if (key == VK_F4)//edit part (for test)
 			{
-				textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,winwidth/15,memochild,sizeof(memochild));
-				EditContent(root,memochild);
-				drawLabel(winwidth/1.5,winheight/20,"Success!Go On~");
+				EditContent(TargetNode,memochild);
+				drawLabel(winwidth/1.5,winheight/22,"Success!Go On~");
 			}
 			break;
 	    default:

@@ -13,7 +13,7 @@ struct TreeNode
 {
     int NodeNumber;
     struct NodeClass NodeObject;
-    char Content[50];
+    char Content[100];
     PtrTreeNode FirstChild, NextSibling;
 };
 

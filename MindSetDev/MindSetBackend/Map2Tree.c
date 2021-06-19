@@ -6,7 +6,7 @@
 PtrTreeNode CreateTree(int NodeNum, struct NodeClass NodeObject){
 
     PtrTreeNode root = (PtrTreeNode)malloc(sizeof(struct TreeNode));
-    strcpy(root->Content, "");// Initially set to be empty
+    strcpy(root->Content, "Text Here!");// Initially set to be empty
     root->NodeObject = NodeObject;
     root->NodeNumber = NodeNum;
     root->FirstChild = NULL;
@@ -222,6 +222,7 @@ PtrTreeNode BinaryFile2Tree(char name[]){
 void Tree2TxtFile(PtrTreeNode Root, char name[]){
     FILE* fin = fopen(name, "w+");
     struct TreeNode Children[20];
+//    fprintf(fin, "Here is test save\n");
     fprintf(fin, "%d %lf %lf %lf %lf %d %s ",Root->NodeNumber,
     Root->NodeObject.height, Root->NodeObject.width, Root->NodeObject.dx, Root->NodeObject.dy,
     Root->NodeObject.color,Root->Content);
@@ -245,6 +246,9 @@ void Tree2TxtFile(PtrTreeNode Root, char name[]){
         }
         Root = q_pop();
     }
+//    add by shengnv 2021.6.19 
+//	update reason: forget fclose, can not save successfully
+    fclose(fin);
 }
 
 PtrTreeNode TxtFile2Tree(char name[]){
@@ -284,5 +288,7 @@ PtrTreeNode TxtFile2Tree(char name[]){
         }
         Root = q_pop();
     }
+    printf("TxtFile2Tree End here\n");
+    fclose(fout);
     return R;
 }

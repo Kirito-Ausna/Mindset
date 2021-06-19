@@ -10,3 +10,6 @@ PtrTreeNode root = &rroot;
 PtrTreeNode Children[10];
 int ChildrenNum;
 int idnum=0;
+int isEdit=0;
+char memo[100]="Text Here";
+PtrTreeNode TargNode=NULL; 

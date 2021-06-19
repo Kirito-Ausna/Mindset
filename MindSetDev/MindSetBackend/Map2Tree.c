@@ -154,7 +154,8 @@ void LevelOrderTravelsal(PtrTreeNode Root, void(*DrawChildren)(
             q_push(Child);
             Child = Child->NextSibling;
         }
-        DrawChildren(Root, num_child, Children);
+        if(num_child != 0)
+            DrawChildren(Root, num_child, Children);
         Root = q_pop();
     }
 }

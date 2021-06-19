@@ -103,6 +103,7 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 	    double fatherx=Parent->NodeObject.dx+Parent->NodeObject.width+0.1;
 	    double fatherydw=Parent->NodeObject.dy+fH+ChildNum/2*h*1.3;
 	    MovePen(Parent->NodeObject.dx+Parent->NodeObject.width,Parent->NodeObject.dy+fH);
+	    printf("Line106: width = %lf\n", Parent->NodeObject.width);
 	    printf("%lf %lf\n",Parent->NodeObject.dx,Parent->NodeObject.dy+fH); 
 	    printf("%lf %lf\n",GetCurrentX(),GetCurrentY());
 	    printf("%lf %lf\n",mouse_x,mouse_y);
@@ -340,6 +341,7 @@ void Main()
     root->NodeObject.color=0;
     root->FirstChild=NULL;
     root->NextSibling=NULL;
+    printf("root->NodeObject.width = %lf\n", root->NodeObject.width); 
 }
 
 

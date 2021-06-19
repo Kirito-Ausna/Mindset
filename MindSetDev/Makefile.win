@@ -4,11 +4,11 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = main.o libgraphics/exceptio.o libgraphics/genlib.o libgraphics/graphics.o libgraphics/linkedlist.o libgraphics/random.o libgraphics/simpio.o libgraphics/strlib.o simpleGUI/imgui.o themebutton/themebutton.o MindSetBackend/Map2Tree.o
-LINKOBJ  = main.o libgraphics/exceptio.o libgraphics/genlib.o libgraphics/graphics.o libgraphics/linkedlist.o libgraphics/random.o libgraphics/simpio.o libgraphics/strlib.o simpleGUI/imgui.o themebutton/themebutton.o MindSetBackend/Map2Tree.o
-LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/mingw32/lib" -static-libstdc++ -static-libgcc -mwindows -g3
-INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"D:/Course/MindSet/Mindset/MindSetDev/libgraphics" -I"D:/Course/MindSet/Mindset/MindSetDev/simpleGUI" -I"D:/Course/MindSet/Mindset/MindSetDev/MindSetBackend"
-CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.7.2/include/c++" -I"D:/Course/MindSet/Mindset/MindSetDev/libgraphics" -I"D:/Course/MindSet/Mindset/MindSetDev/simpleGUI" -I"D:/Course/MindSet/Mindset/MindSetDev/MindSetBackend"
+OBJ      = main.o libgraphics/exceptio.o libgraphics/genlib.o libgraphics/graphics.o libgraphics/linkedlist.o libgraphics/random.o libgraphics/simpio.o libgraphics/strlib.o simpleGUI/imgui.o MindSetBackend/Map2Tree.o
+LINKOBJ  = main.o libgraphics/exceptio.o libgraphics/genlib.o libgraphics/graphics.o libgraphics/linkedlist.o libgraphics/random.o libgraphics/simpio.o libgraphics/strlib.o simpleGUI/imgui.o MindSetBackend/Map2Tree.o
+LIBS     = -L"E:/software/devc/Dev-Cpp/MinGW32/lib" -L"E:/software/devc/Dev-Cpp/MinGW32/mingw32/lib" -static-libstdc++ -static-libgcc -mwindows -g3
+INCS     = -I"E:/software/devc/Dev-Cpp/MinGW32/include" -I"D:/MyGithub/Mindset/MindSetDev/libgraphics" -I"D:/MyGithub/Mindset/MindSetDev/MindSetBackend" -I"D:/MyGithub/Mindset/MindSetDev/simpleGUI"
+CXXINCS  = -I"E:/software/devc/Dev-Cpp/MinGW32/include" -I"E:/software/devc/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.7.2/include/c++" -I"D:/MyGithub/Mindset/MindSetDev/libgraphics" -I"D:/MyGithub/Mindset/MindSetDev/MindSetBackend" -I"D:/MyGithub/Mindset/MindSetDev/simpleGUI"
 BIN      = MindSet.exe
 CXXFLAGS = $(CXXINCS) -g3
 CFLAGS   = $(INCS) -g3
@@ -50,9 +50,6 @@ libgraphics/strlib.o: libgraphics/strlib.c
 
 simpleGUI/imgui.o: simpleGUI/imgui.c
 	$(CC) -c simpleGUI/imgui.c -o simpleGUI/imgui.o $(CFLAGS)
-
-themebutton/themebutton.o: themebutton/themebutton.c
-	$(CC) -c themebutton/themebutton.c -o themebutton/themebutton.o $(CFLAGS)
 
 MindSetBackend/Map2Tree.o: MindSetBackend/Map2Tree.c
 	$(CC) -c MindSetBackend/Map2Tree.c -o MindSetBackend/Map2Tree.o $(CFLAGS)

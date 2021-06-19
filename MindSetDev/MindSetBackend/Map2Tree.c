@@ -11,7 +11,7 @@ PtrTreeNode CreateTree(int NodeNum, struct NodeClass NodeObject){
     root->NodeNumber = NodeNum;
     root->FirstChild = NULL;
     root->NextSibling = NULL;
-    return root;
+	return root;
 }
 
 PtrTreeNode LocateNode(double x, double y, PtrTreeNode root){
@@ -20,7 +20,8 @@ PtrTreeNode LocateNode(double x, double y, PtrTreeNode root){
     }
 
     struct NodeClass obj = root->NodeObject;
-    if(x>obj.dx&&x<obj.dx+obj.width&&y>obj.dy&&y<obj.dy+obj.height)
+//    printf("%lf %lf %lf %lf",obj.dx,obj.dx+obj.width,obj.dy,obj.dy+obj.height);
+    if((x>obj.dx)&&(x<obj.dx+obj.width)&&(y>obj.dy)&&(y<obj.dy+obj.height))
         return root;
 
     PtrTreeNode Node1 = LocateNode(x, y, root->FirstChild);

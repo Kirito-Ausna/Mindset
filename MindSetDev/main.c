@@ -190,7 +190,7 @@ void CharEventProcess(char ch)
 // 用户的键盘事件响应函数
 void KeyboardEventProcess(int key, int event)
 {  
-//    display();
+    display();
 	uiGetKeyboard(key,event);
 	PtrTreeNode yf=NULL; 
 	static char memochild[30]="Text Here";
@@ -201,10 +201,10 @@ void KeyboardEventProcess(int key, int event)
 		if (key == VK_F1)//添加子主题(why not TAB? -has been used) 
 	    	    {
 //	    	    	drawLabel(winwidth/1.5,winheight/22,"Hello World!");
-	    	    	double move_x=GetCurrentX();
-	                double move_y=GetCurrentY();
-	    	        TargetNode=LocateNode(move_x,move_y,root);//temporary varible
-	    	        
+//	    	    	double move_x=GetCurrentX();
+//	                double move_y=GetCurrentY();
+	    	        TargetNode=LocateNode(mouse_x,mouse_y,root);//temporary varible
+	    	        TargetNode=root;
 	    	        if(TargetNode!=NULL)
 					{
 						ChildrenNum=FindChildren(TargetNode,Children);
@@ -221,16 +221,16 @@ void KeyboardEventProcess(int key, int event)
 		    	    }else{
 //		    	    	drawLabel(winwidth/1.5,winheight/22,"Here You are");
 		    	    	char toolman[10];
-						sprintf(toolman,"%lf %lf",move_x,move_y);
+						sprintf(toolman,"%lf %lf",mouse_x,mouse_y);
 						drawLabel(winwidth/1.5,winheight/22,toolman);
 						
 		    	    }
 		        }
 	        if (key == VK_F2)//添加同级主题 
 			    {
-			    	double move_x=GetCurrentX();
-	                double move_y=GetCurrentY();
-			        TargetNode=LocateNode(move_x,move_y,root);
+//			    	double move_x=GetCurrentX();
+//	                double move_y=GetCurrentY();
+			        TargetNode=LocateNode(mouse_x,mouse_y,root);
 			        if(TargetNode!=NULL)
 					{
 						DisplayClear();
@@ -248,9 +248,9 @@ void KeyboardEventProcess(int key, int event)
 			    }
 			if (key == VK_F3)//删除一个主题 
 			    {
-			    	double move_x=GetCurrentX();
-	                double move_y=GetCurrentY();
-			    	TargetNode=LocateNode(move_x,move_y,root);
+//			    	double move_x=GetCurrentX();
+//	                double move_y=GetCurrentY();
+			    	TargetNode=LocateNode(mouse_x,mouse_y,root);
 			    	if(TargetNode!=NULL)
 			    	{
 			    		DisplayClear();
@@ -266,14 +266,15 @@ void KeyboardEventProcess(int key, int event)
 			    }
 			if (key == VK_F4)//edit part (for test)
 			{
-				double move_x=GetCurrentX();
-	            double move_y=GetCurrentY();
+//				double move_x=GetCurrentX();
+//	            double move_y=GetCurrentY();
 //	            drawLabel(winwidth/1.5,winheight/22,"Here You are");
-				TargetNode=LocateNode(move_x,move_y,root);//temporary varible
+				TargetNode=LocateNode(mouse_x,mouse_y,root);//temporary varible
 				if(TargetNode == NULL){
 					char toolman[10];
-					sprintf(toolman,"%lf %lf",move_x,move_y);
+					sprintf(toolman,"%lf %lf",mouse_x,mouse_y);
 					drawLabel(winwidth/1.5,winheight/22,toolman);
+					printf("It's a test");
 				}else{
 				EditContent(TargetNode,memochild);
 				drawLabel(winwidth/1.5,winheight/22,"Success!Go On~");
@@ -283,24 +284,24 @@ void KeyboardEventProcess(int key, int event)
 	    default:
 		break;
 	} 
-	display();
+//	display();
 }
 
 // 用户的鼠标事件响应函数
 void MouseEventProcess(int x, int y, int button, int event)
 {
+	display(); //刷新显示 
 	uiGetMouse(x, y, button, event); // needed for using simpleGUI
-	double move_x=GetCurrentX();
-	double move_y=GetCurrentY();
+	mouse_x=ScaleXInches(x); 
+	mouse_y=ScaleYInches(y);
 	PtrTreeNode TargetNode=root;
-	if(LocateNode(move_x,move_y,TargetNode)!=NULL&&event==DOUBLE_CLICK)
+	if(LocateNode(mouse_x,mouse_y,TargetNode)!=NULL&&event==DOUBLE_CLICK)
 	{
 		static char memochild[30]="Text Here";
 		textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,winwidth/15,memochild,sizeof(memochild));
 		EditContent(TargetNode,memochild);
 		TargetNode->NodeObject.width=TextStringWidth(memochild);
 	}
-	display(); //刷新显示 
 }
 
 // 用户主程序入口
@@ -320,7 +321,7 @@ void Main()
 	registerKeyboardEvent(KeyboardEventProcess);// 键盘 
 	registerMouseEvent(MouseEventProcess);      // 鼠标    
 	// 打开控制台，方便用printf/scanf输出/入变量信息，方便调试
-//	InitConsole();
+	InitConsole();
 	double x=winwidth/3.5;
 	double y=winheight/1.8;
 	double w=winwidth/10;
@@ -338,7 +339,6 @@ void Main()
     root->NodeObject.color=0;
     root->FirstChild=NULL;
     root->NextSibling=NULL;
-//    printf("%d",switch_button);
 }
 
 

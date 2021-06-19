@@ -22,7 +22,7 @@ void drawMenu()
 		"保存（二进制）    |Ctrl-B", // 快捷键必须采用[Ctrl-X]格式，放在字符串的结尾
 		"保存（文本文件）|Ctrl-T",
 		"退出                        |Ctrl-E"};
-	static char * menuListExport[] = {"   |导出|     ",
+	static char * menuListExport[] = {"   |插入|     ",
 		"图片",
 		"大纲",
 		};
@@ -45,14 +45,15 @@ void drawMenu()
 	// “文件” 菜单
 	selection = menuList(GenUIID(0), x, y-h, w, wlist, h, menuListFile, sizeof(menuListFile)/sizeof(menuListFile[0]));
 	if( selection>0 ) selectedLabel = menuListFile[selection];
-	if( selection==1 )
-	if( selection==2 )
+	if( selection==1 )Tree2BinaryFile(root,"文件1");
+	if( selection==2 ){Tree2TxtFile(root,"文件3.txt");}
 	if( selection==3 )
 		exit(-1); // choose to exit
 	
 	// “导出” 菜单
 	selection = menuList(GenUIID(0),x+w,  y-h, w, wlist,h, menuListExport,sizeof(menuListExport)/sizeof(menuListExport[0]));
 	if( selection>0 ) selectedLabel = menuListExport[selection];
+	
 	
 	// “帮助” 菜单
 	selection = menuList(GenUIID(0),x+2*w,y-h, w, wlist, h, menuListHelp,sizeof(menuListHelp)/sizeof(menuListHelp[0]));
@@ -82,7 +83,8 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 //        	static char mroot[80]="Text Here";
 //    	    textbox(GenUIID(0),winwidth/1.5,winheight/15,w*3,h,mroot,sizeof(mroot));//ready for content adding
 //    	    root = CreateTree(0,root->NodeObject);//give it to the backend
-    	    EditContent(root,memo);//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend
+//    	    EditContent(root,memo);
+			//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend
 //		    root->NodeNumber = 0;//initinalization. root is a global variable defined in draw.h
 //		    root->NodeObject.height=h;
 //		    root->NodeObject.width=w*1.4;
@@ -91,7 +93,7 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 //		    root->NodeObject.color=0;
 //		    root->FirstChild=NULL;
 //		    root->NextSibling=NULL;
-		    button(GenUIID(0), x, y, w*1.4, h, memo);//Actually,there are two buttons here!Thankfully,they are the same.    
+		    button(GenUIID(0), x, y, w*1.4, h, root->Content);//Actually,there are two buttons here!Thankfully,they are the same.    
 		}
 	}
 	else if(ChildNum==0)
@@ -103,10 +105,10 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 	    double fatherx=Parent->NodeObject.dx+Parent->NodeObject.width+0.1;
 	    double fatherydw=Parent->NodeObject.dy+fH+ChildNum/2*h*1.3;
 	    MovePen(Parent->NodeObject.dx+Parent->NodeObject.width,Parent->NodeObject.dy+fH);
-	    printf("Line106: width = %lf\n", Parent->NodeObject.width);
-	    printf("%lf %lf\n",Parent->NodeObject.dx,Parent->NodeObject.dy+fH); 
-	    printf("%lf %lf\n",GetCurrentX(),GetCurrentY());
-	    printf("%lf %lf\n",mouse_x,mouse_y);
+//	    printf("Line106: width = %lf\n", Parent->NodeObject.width);
+//	    printf("%lf %lf\n",Parent->NodeObject.dx,Parent->NodeObject.dy+fH); 
+//	    printf("%lf %lf\n",GetCurrentX(),GetCurrentY());
+//	    printf("%lf %lf\n",mouse_x,mouse_y);
 	    int i;
 	    SetPenColor("Dark Gray");
 	    if(ChildNum%2!=0)
@@ -255,11 +257,12 @@ void KeyboardEventProcess(int key, int event)
 //			    	double move_x=GetCurrentX();
 //	                double move_y=GetCurrentY();
 			    	TargetNode=LocateNode(mouse_x,mouse_y,root);
+//			    	printf("TargetNode->NodeObject.dx=%lf\ncurrentX=%lf\n",TargetNode->NodeObject.dx,mouse_x);
 			    	if(TargetNode!=NULL)
 			    	{
-			    		DisplayClear();
-	                    //清屏
-			    		DeleteTree(TargetNode); 
+//			    		printf("Here you enter delete targ name = %s\n", TargetNode->Content);
+			    		DeleteTree(TargetNode);
+//						printf("After delete");
 			    		switch(switch_button) 
 		    	        {
 		    	            case 1:LevelOrderTravelsal(root, DrawChildren1);break;
@@ -282,7 +285,7 @@ void KeyboardEventProcess(int key, int event)
 				}else{
 				EditContent(TargetNode,memochild);
 				drawLabel(winwidth/1.5,winheight/22,"Success!Go On~");
-			}
+			    }
 			}
 			break;
 	    default:
@@ -355,19 +358,21 @@ void Main()
     root->NodeObject.color=0;
     root->FirstChild=NULL;
     root->NextSibling=NULL;
-    printf("root->NodeObject.width = %lf\n", root->NodeObject.width); 
+//    printf("root->NodeObject.width = %lf\n", root->NodeObject.width); 
     InitalQueue();
+//    TxtFile2Tree("文件1.txt");
 }
 
 void display()
 {
+//	printf("in display root->content = %s\n", root->Content);
 //	PtrTreeNode TargetNode=NULL;
 	// 清屏
 	DisplayClear();
 	if(isEdit){
 		textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,GetFontHeight()*2,memo,sizeof(memo));
 		if(TargNode != NULL){
-			printf("In display, Targnode->Context = %s\n", TargNode->Content);
+//			printf("In display, Targnode->Context = %s\n", TargNode->Content);
 			EditContent(TargNode,memo);	
 		}
 		

@@ -73,7 +73,7 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 	//draw the root 
 	if(Parent==NULL)
 	{
-        if(button(GenUIID(0), x, y, w*1.8, h, memoroot))//draw the button first
+        if(button(GenUIID(0), x, y, w*1.4, h, memoroot))//draw the button first
         {
     	     isEditing=1;
         }
@@ -85,13 +85,13 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
     	    EditContent(root,mroot);//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend
 //		    root->NodeNumber = 0;//initinalization. root is a global variable defined in draw.h
 //		    root->NodeObject.height=h;
-//		    root->NodeObject.width=w*1.8;
+//		    root->NodeObject.width=w*1.4;
 //		    root->NodeObject.dx=x;
 //		    root->NodeObject.dy=y;
 //		    root->NodeObject.color=0;
 //		    root->FirstChild=NULL;
 //		    root->NextSibling=NULL;
-		    button(GenUIID(0), x, y, w*1.8, h, mroot);//Actually,there are two buttons here!Thankfully,they are the same.    
+		    button(GenUIID(0), x, y, w*1.4, h, mroot);//Actually,there are two buttons here!Thankfully,they are the same.    
 		}
 	}
 	else if(ChildNum==0)
@@ -100,9 +100,12 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 	}
 	else//draw the children
 	{
-	    double fatherx=Parent->NodeObject.dx+w+0.1;
-	    double fatherydw=Parent->NodeObject.dy+fH/2+ChildNum/2*h*1.3;
-	    MovePen(Parent->NodeObject.dx+w,Parent->NodeObject.dy+fH);
+	    double fatherx=Parent->NodeObject.dx+Parent->NodeObject.width+0.1;
+	    double fatherydw=Parent->NodeObject.dy+fH+ChildNum/2*h*1.3;
+	    MovePen(Parent->NodeObject.dx+Parent->NodeObject.width,Parent->NodeObject.dy+fH);
+	    printf("%lf %lf\n",Parent->NodeObject.dx,Parent->NodeObject.dy+fH); 
+	    printf("%lf %lf\n",GetCurrentX(),GetCurrentY());
+	    printf("%lf %lf\n",mouse_x,mouse_y);
 	    int i;
 	    SetPenColor("Dark Gray");
 	    if(ChildNum%2!=0)
@@ -120,7 +123,7 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 		    for(i=0;i<ChildNum-1;i++)
 		    {
 			    DrawLine(0.1,0);
-			    if(button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i]->Content)+0.2,h,Children[i]->Content));
+			    button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i]->Content)+0.2,h,Children[i]->Content);
 			    EditCoordinate(Children[i],move_x+0.1,move_y-0.5*h);//when inserting or deleting, every child's coordinate is supposed to be changed 
 				Children[i]->NodeObject.height=h;
 				Children[i]->NodeObject.width=TextStringWidth(Children[i]->Content)+0.2;
@@ -204,7 +207,6 @@ void KeyboardEventProcess(int key, int event)
 //	    	    	double move_x=GetCurrentX();
 //	                double move_y=GetCurrentY();
 	    	        TargetNode=LocateNode(mouse_x,mouse_y,root);//temporary varible
-	    	        TargetNode=root;
 	    	        if(TargetNode!=NULL)
 					{
 						ChildrenNum=FindChildren(TargetNode,Children);
@@ -233,8 +235,6 @@ void KeyboardEventProcess(int key, int event)
 			        TargetNode=LocateNode(mouse_x,mouse_y,root);
 			        if(TargetNode!=NULL)
 					{
-						DisplayClear();
-	                    //清屏
 					    ChildrenNum=FindChildren(TargetNode,Children);
 			            yf = InsertTreeNode(TargetNode,1,idnum,TargetNode->NodeObject);
 	    	            switch(switch_button) 
@@ -322,18 +322,19 @@ void Main()
 	registerMouseEvent(MouseEventProcess);      // 鼠标    
 	// 打开控制台，方便用printf/scanf输出/入变量信息，方便调试
 	InitConsole();
-	double x=winwidth/3.5;
-	double y=winheight/1.8;
-	double w=winwidth/10;
-	double fH=GetFontHeight();
-	double h=fH*2;
+	double x=winwidth/3.5;//2.857
+	double y=winheight/1.8;//3.889
+	double w=winwidth/10;//1
+	double fH=GetFontHeight();//0.1667
+//	printf("%lf",fH);
+	double h=fH*2;//0.3334
 	static char memoroot[80]="Click To Start"; //输入提示
 	root = CreateTree(0,Father);//give it to the backend
 	static char mroot[80]="Text Here";
     EditContent(root,mroot);//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend
     root->NodeNumber = 0;//initinalization. root is a global variable defined in draw.h
     root->NodeObject.height=h;
-    root->NodeObject.width=w*1.8;
+    root->NodeObject.width=w*1.4;//1.4
     root->NodeObject.dx=x;
     root->NodeObject.dy=y;
     root->NodeObject.color=0;

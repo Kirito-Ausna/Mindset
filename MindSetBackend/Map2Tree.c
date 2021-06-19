@@ -271,7 +271,7 @@ PtrTreeNode TxtFile2Tree(char name[]){
     FILE* fout = fopen(name, "r");
     PtrTreeNode Root = (PtrTreeNode)malloc(sizeof(struct TreeNode));
     struct TreeNode Children[20];
-    fscanf(fout, "%d %lf %lf %lf %lf %d %s", &Root->NodeNumber,
+    fscanf(fout, "%d %lf %lf %lf %lf %d %s %d", &Root->NodeNumber,
     &Root->NodeObject.height, &Root->NodeObject.width, &Root->NodeObject.dx, &Root->NodeObject.dy,
     &Root->NodeObject.color,Root->Content);
     Root->FirstChild = NULL;
@@ -279,8 +279,9 @@ PtrTreeNode TxtFile2Tree(char name[]){
     PtrTreeNode R = Root;
     while (Root)
     {
-        int num_children;
-        fscanf(fout, "%d", &num_children);
+        char num_children;
+        // fscanf(fout, "%d", &num_children);
+        num_children = fgetc(fout);
         if(num_children != 0){
            int i;
            for(i=0;i<num_children;i++){
@@ -292,7 +293,6 @@ PtrTreeNode TxtFile2Tree(char name[]){
             *(Root->FirstChild) = Children[0];
             q_push(Root->FirstChild);
             PtrTreeNode Child = Root->FirstChild;
-            int i;
             for(i = 1;i<num_children;i++){
                 Child->NextSibling = (PtrTreeNode)malloc(sizeof(struct TreeNode));
                 q_push(Root->NextSibling);
@@ -308,17 +308,11 @@ PtrTreeNode TxtFile2Tree(char name[]){
     return R;
 }
 
-// int main(void){
-//     struct NodeClass tmp;
-//     tmp.color = 0;
-//     tmp.dx = 2;
-//     tmp.dy = 2;
-//     tmp.height = 10;
-//     tmp.width = 10;
-
-//     PtrTreeNode Root = CreateTree(0, tmp);
-//     PtrTreeNode Toolman = LocateNode(10,10, Root);
-//     EditContent(Toolman,"Test!");
-//     printf("%d %s",Toolman->NodeNumber,Toolman->Content);
-//     return 0;
-// }
+int main(void){
+    PtrTreeNode Root;
+    InitalQueue();
+    printf("%d %d",queue.max_size,queue.cur_size);
+    Root = TxtFile2Tree("нд╪Ч2.txt");
+    printf("%s",Root->Content);
+    return 0;
+}

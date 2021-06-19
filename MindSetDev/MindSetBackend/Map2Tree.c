@@ -6,7 +6,7 @@
 PtrTreeNode CreateTree(int NodeNum, struct NodeClass NodeObject){
 
     PtrTreeNode root = (PtrTreeNode)malloc(sizeof(struct TreeNode));
-    strcpy(root->Content, "");// Initially set to be empty
+    strcpy(root->Content, "Text Here!");// Initially set to be empty
     root->NodeObject = NodeObject;
     root->NodeNumber = NodeNum;
     root->FirstChild = NULL;

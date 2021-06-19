@@ -79,10 +79,10 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
         }
         if(isEditing)
         {
-        	static char mroot[80]="Text Here";
-    	    textbox(GenUIID(0),winwidth/1.5,winheight/15,w*3,h,mroot,sizeof(mroot));//ready for content adding
+//        	static char mroot[80]="Text Here";
+//    	    textbox(GenUIID(0),winwidth/1.5,winheight/15,w*3,h,mroot,sizeof(mroot));//ready for content adding
 //    	    root = CreateTree(0,root->NodeObject);//give it to the backend
-    	    EditContent(root,mroot);//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend
+    	    EditContent(root,memo);//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend
 //		    root->NodeNumber = 0;//initinalization. root is a global variable defined in draw.h
 //		    root->NodeObject.height=h;
 //		    root->NodeObject.width=w*1.4;
@@ -91,7 +91,7 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 //		    root->NodeObject.color=0;
 //		    root->FirstChild=NULL;
 //		    root->NextSibling=NULL;
-		    button(GenUIID(0), x, y, w*1.4, h, mroot);//Actually,there are two buttons here!Thankfully,they are the same.    
+		    button(GenUIID(0), x, y, w*1.4, h, memo);//Actually,there are two buttons here!Thankfully,they are the same.    
 		}
 	}
 	else if(ChildNum==0)
@@ -123,6 +123,7 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 		    double move_y=GetCurrentY();
 		    for(i=0;i<ChildNum-1;i++)
 		    {
+		    	SetPenColor("Dark Gray");
 			    DrawLine(0.1,0);
 			    button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i]->Content)+0.2,h,Children[i]->Content);
 			    EditCoordinate(Children[i],move_x+0.1,move_y-0.5*h);//when inserting or deleting, every child's coordinate is supposed to be changed 
@@ -132,10 +133,12 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 				Children[i]->NodeObject.dy=move_y-0.5*h;
 				Children[i]->NodeObject.color=0;
 				MovePen(fatherx,move_y);
+				SetPenColor("Dark Gray");
 			    DrawLine(0,-h*1.3);
 			    move_x=GetCurrentX();
 			    move_y=GetCurrentY();
 		    }
+		    SetPenColor("Dark Gray");
 		    DrawLine(0.1,0);
 		    if(button(GenUIID(0),move_x+0.1,move_y-0.5*h,TextStringWidth(Children[i]->Content)+0.2,h,Children[i]->Content));
 		    EditCoordinate(Children[i],move_x+0.1,move_y-0.5*h);
@@ -291,18 +294,29 @@ void KeyboardEventProcess(int key, int event)
 // 用户的鼠标事件响应函数
 void MouseEventProcess(int x, int y, int button, int event)
 {
-	display(); //刷新显示 
+//	display(); //刷新显示 
 	uiGetMouse(x, y, button, event); // needed for using simpleGUI
 	mouse_x=ScaleXInches(x); 
 	mouse_y=ScaleYInches(y);
-	PtrTreeNode TargetNode=root;
-	if(LocateNode(mouse_x,mouse_y,TargetNode)!=NULL&&event==DOUBLE_CLICK)
+//	PtrTreeNode TargetNode=NULL;
+//	display();
+	if(event==DOUBLE_CLICK)
 	{
-		static char memochild[30]="Text Here";
-		textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,winwidth/15,memochild,sizeof(memochild));
-		EditContent(TargetNode,memochild);
-		TargetNode->NodeObject.width=TextStringWidth(memochild);
+		PtrTreeNode TempNode = LocateNode(mouse_x,mouse_y,root);
+		if( TempNode != NULL){
+			TargNode = TempNode;
+			strcpy(memo, TargNode->Content);
+			isEdit=1;	
+		}
 	}
+	display(); //刷新显示
+//	if(isEdit==1&&TargetNode!=NULL)
+//	{
+//		static char memochild[30]="Text Here";
+//		textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,GetFontHeight()*2,memochild,sizeof(memochild));
+//		EditContent(TargetNode,memo);
+//		LevelOrderTravelsal(root,DrawChildren1);
+//		TargetNode->NodeObject.width=TextStringWidth(memochild);//!!!!!!!!!!!!!
 }
 
 // 用户主程序入口
@@ -342,13 +356,23 @@ void Main()
     root->FirstChild=NULL;
     root->NextSibling=NULL;
     printf("root->NodeObject.width = %lf\n", root->NodeObject.width); 
+    InitalQueue();
 }
-
 
 void display()
 {
+//	PtrTreeNode TargetNode=NULL;
 	// 清屏
 	DisplayClear();
+	if(isEdit){
+		textbox(GenUIID(0),winwidth/1.5,winheight/15,winwidth/10*3,GetFontHeight()*2,memo,sizeof(memo));
+		if(TargNode != NULL){
+			printf("In display, Targnode->Context = %s\n", TargNode->Content);
+			EditContent(TargNode,memo);	
+		}
+		
+	}
+	
 	//调用模式 
 	ModeChoice();
 #if defined(DEMO_MENU)

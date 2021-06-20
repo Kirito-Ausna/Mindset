@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "draw.h"
 
+
 #define DEMO_MENU
 #define DEMO_BUTTON
 #define DEMO_MINDMAP
@@ -15,6 +16,8 @@
 
 
 #if defined(DEMO_MENU)
+// 用户的显示函数
+void display();
 // 菜单演示程序
 void drawMenu()
 { 
@@ -22,9 +25,9 @@ void drawMenu()
 		"保存（二进制）    |Ctrl-B", // 快捷键必须采用[Ctrl-X]格式，放在字符串的结尾
 		"保存（文本文件）|Ctrl-T",
 		"退出                        |Ctrl-E"};
-	static char * menuListExport[] = {"   |插入|     ",
-		"图片",
-		"大纲",
+	static char * menuListExport[] = {"   |导入|     ",
+		"文件（二进制）",
+		"文件 （文本）",
 		};
 	static char * menuListHelp[] = {"    |帮助|  ",
 		"使用手册",
@@ -45,14 +48,25 @@ void drawMenu()
 	// “文件” 菜单
 	selection = menuList(GenUIID(0), x, y-h, w, wlist, h, menuListFile, sizeof(menuListFile)/sizeof(menuListFile[0]));
 	if( selection>0 ) selectedLabel = menuListFile[selection];
-	if( selection==1 )Tree2BinaryFile(root,"文件1");
-	if( selection==2 ){Tree2TxtFile(root,"文件3.txt");}
+	if( selection==1 )Tree2BinaryFile(root,"MapFile.dat");
+	if( selection==2 ){Tree2TxtFile(root,"MapFile.txt");}
 	if( selection==3 )
 		exit(-1); // choose to exit
 	
-	// “导出” 菜单
+	// “导入” 菜单
 	selection = menuList(GenUIID(0),x+w,  y-h, w, wlist,h, menuListExport,sizeof(menuListExport)/sizeof(menuListExport[0]));
 	if( selection>0 ) selectedLabel = menuListExport[selection];
+	if( selection==1 )
+	{
+	    root=BinaryFile2Tree("MapFile.dat");
+		display();
+	}
+	if( selection==2 )
+	{	
+		root=TxtFile2Tree("MapFile.txt");
+		display();
+	}
+	
 	
 	
 	// “帮助” 菜单
@@ -80,20 +94,7 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
         }
         if(isEditing)
         {
-//        	static char mroot[80]="Text Here";
-//    	    textbox(GenUIID(0),winwidth/1.5,winheight/15,w*3,h,mroot,sizeof(mroot));//ready for content adding
-//    	    root = CreateTree(0,root->NodeObject);//give it to the backend
-//    	    EditContent(root,memo);
-			//while using the textbox,the value of memoroot is supposed to be changed, so you are supposed to change it in the backend
-//		    root->NodeNumber = 0;//initinalization. root is a global variable defined in draw.h
-//		    root->NodeObject.height=h;
-//		    root->NodeObject.width=w*1.4;
-//		    root->NodeObject.dx=x;
-//		    root->NodeObject.dy=y;
-//		    root->NodeObject.color=0;
-//		    root->FirstChild=NULL;
-//		    root->NextSibling=NULL;
-		    button(GenUIID(0), x, y, w*1.4, h, root->Content);//Actually,there are two buttons here!Thankfully,they are the same.    
+		    button(GenUIID(0), x, y, w*1.4, h, root->Content);    
 		}
 	}
 	else if(ChildNum==0)
@@ -105,10 +106,6 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 	    double fatherx=Parent->NodeObject.dx+Parent->NodeObject.width+0.1;
 	    double fatherydw=Parent->NodeObject.dy+fH+ChildNum/2*h*1.3;
 	    MovePen(Parent->NodeObject.dx+Parent->NodeObject.width,Parent->NodeObject.dy+fH);
-//	    printf("Line106: width = %lf\n", Parent->NodeObject.width);
-//	    printf("%lf %lf\n",Parent->NodeObject.dx,Parent->NodeObject.dy+fH); 
-//	    printf("%lf %lf\n",GetCurrentX(),GetCurrentY());
-//	    printf("%lf %lf\n",mouse_x,mouse_y);
 	    int i;
 	    SetPenColor("Dark Gray");
 	    if(ChildNum%2!=0)
@@ -152,13 +149,13 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 	}
 }
 
+
 void DrawChildren2(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 {
 }
 void DrawChildren3(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 {
 }
-
 
 //切换选择模式的总函数 
 void ModeChoice()
@@ -176,7 +173,11 @@ void ModeChoice()
    	    switch_button=3;
    	switch(switch_button)
 	   {
-	   	case 1:LevelOrderTravelsal(root,DrawChildren1);break;
+	   	case 1:
+		   {
+		   	 LevelOrderTravelsal(root,DrawChildren1);
+			 break;
+		   }
 	   	//case 2:LevelOrderTravelsal(root,DrawChildren2);
 	   } 
 }
@@ -186,8 +187,6 @@ void ModeChoice()
 void DisplayClear(void); 
 // 计时器启动函数，provided in libgraphics
 //void startTimer(int id,int timeinterval);
-// 用户的显示函数
-void display(void); 
 
 // 用户的字符事件响应函数
 void CharEventProcess(char ch)
@@ -199,7 +198,6 @@ void CharEventProcess(char ch)
 // 用户的键盘事件响应函数
 void KeyboardEventProcess(int key, int event)
 {  
-    display();
 	uiGetKeyboard(key,event);
 	PtrTreeNode yf=NULL; 
 	static char memochild[30]="Text Here";
@@ -209,9 +207,6 @@ void KeyboardEventProcess(int key, int event)
     	case KEY_UP:	
 		if (key == VK_F1)//添加子主题(why not TAB? -has been used) 
 	    	    {
-//	    	    	drawLabel(winwidth/1.5,winheight/22,"Hello World!");
-//	    	    	double move_x=GetCurrentX();
-//	                double move_y=GetCurrentY();
 	    	        TargetNode=LocateNode(mouse_x,mouse_y,root);//temporary varible
 	    	        if(TargetNode!=NULL)
 					{
@@ -227,11 +222,9 @@ void KeyboardEventProcess(int key, int event)
 		    	        idnum++;*/
 		    	        drawLabel(winwidth/1.5,winheight/22,"Hello World!");
 		    	    }else{
-//		    	    	drawLabel(winwidth/1.5,winheight/22,"Here You are");
 		    	    	char toolman[10];
-						sprintf(toolman,"%lf %lf",mouse_x,mouse_y);
+						sprintf(toolman,"Sorry.Do Not Find the Target.(mouse in %lf %lf)",mouse_x,mouse_y);
 						drawLabel(winwidth/1.5,winheight/22,toolman);
-						
 		    	    }
 		        }
 	        if (key == VK_F2)//添加同级主题 
@@ -291,7 +284,7 @@ void KeyboardEventProcess(int key, int event)
 	    default:
 		break;
 	} 
-//	display();
+	display();
 }
 
 // 用户的鼠标事件响应函数
@@ -361,6 +354,7 @@ void Main()
 //    printf("root->NodeObject.width = %lf\n", root->NodeObject.width); 
     InitalQueue();
 //    TxtFile2Tree("文件1.txt");
+	display();
 }
 
 void display()
@@ -385,6 +379,8 @@ void display()
 	drawMenu();
 #endif
 }
+
+
 
 
 

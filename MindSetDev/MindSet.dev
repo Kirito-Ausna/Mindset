@@ -250,16 +250,6 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit24]
-FileName=themebutton\themebutton.c
-CompileCpp=0
-Folder=button
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit23]
 FileName=draw.h
 CompileCpp=0

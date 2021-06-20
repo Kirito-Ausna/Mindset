@@ -183,6 +183,7 @@ void Tree2BinaryFile(PtrTreeNode Root, char name[]){
         }
         Root = q_pop();
     }
+    fclose(fin);
 }
 
 PtrTreeNode BinaryFile2Tree(char name[]){
@@ -206,7 +207,7 @@ PtrTreeNode BinaryFile2Tree(char name[]){
             int i=1;
             for(i = 1;i<num_children;i++){
                 Child->NextSibling = (PtrTreeNode)malloc(sizeof(struct TreeNode));
-                q_push(Root->NextSibling);
+                q_push(Child->NextSibling);
                 *(Child->NextSibling) = Children[i];
                 Child = Child->NextSibling;
             }
@@ -216,6 +217,7 @@ PtrTreeNode BinaryFile2Tree(char name[]){
         }
         Root = q_pop();
     }
+    fclose(fout);
     return R;
 }
 
@@ -278,7 +280,7 @@ PtrTreeNode TxtFile2Tree(char name[]){
             PtrTreeNode Child = Root->FirstChild;
             for(i = 1;i<num_children;i++){
                 Child->NextSibling = (PtrTreeNode)malloc(sizeof(struct TreeNode));
-                q_push(Root->NextSibling);
+                q_push(Child->NextSibling);
                 *(Child->NextSibling) = Children[i];
                 Child = Child->NextSibling;
             }

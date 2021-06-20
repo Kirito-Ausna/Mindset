@@ -3,6 +3,52 @@
 #include"Map2Tree.h"
 #include<string.h>
 
+void InitalQueue(){
+    queue.head = 0;
+    queue.tail = -1;
+    queue.max_size = 20;
+    queue.cur_size = 0;
+}
+
+int is_full(){
+    if(queue.cur_size == queue.max_size){
+        return 1;
+    }else
+        return 0;
+}
+
+int is_empty(){
+    if(queue.cur_size == 0)
+    {
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+void q_push(PtrTreeNode node){
+    if(!is_full())
+    {
+        queue.tail = (queue.tail + 1)%queue.max_size;
+        queue.Q[queue.tail] = node;
+        queue.cur_size++;
+    }else{
+        printf("The space of Queue is run out!\n");
+    }
+}
+
+PtrTreeNode q_pop(){
+    if(!is_empty())
+    {
+        PtrTreeNode front = queue.Q[queue.head];
+        queue.head = (queue.head + 1)%queue.max_size;
+        queue.cur_size--;
+        return front;
+    }else{
+        return NULL;
+    }
+}
+
 PtrTreeNode CreateTree(int NodeNum, struct NodeClass NodeObject){
 
     PtrTreeNode root = (PtrTreeNode)malloc(sizeof(struct TreeNode));
@@ -53,18 +99,63 @@ void FreeNode(PtrTreeNode node){
     }
 }
 
-void DeleteTree(PtrTreeNode subtree){
-    if(subtree == NULL){
+void deletecascade(PtrTreeNode firstChild){
+    if(firstChild == NULL){
         return;
     }
-    DeleteTree(subtree->FirstChild);
-    DeleteTree(subtree->NextSibling);
-    if(subtree != Root){
-        FreeNode(subtree);
+    deletecascade(firstChild->FirstChild);
+    deletecascade(firstChild->NextSibling);
+    if(firstChild != Root){
+        FreeNode(firstChild);
     }else{
-        EditContent(subtree,"");
+        EditContent(firstChild,"");
     }
 }
+
+void DeleteTree(PtrTreeNode subtree, PtrTreeNode Root){
+    int find = 0;
+    if(subtree == NULL){
+        printf("No node to delete!");
+        return;
+    }
+    if(subtree == Root){
+        deletecascade(Root->FirstChild);
+    }
+    PtrTreeNode Parent = Root;
+    PtrTreeNode lastsibling = NULL;
+    while (Parent)
+    {
+        PtrTreeNode Child = Parent->FirstChild;
+        while (Child)
+        {
+            if(Child == subtree){
+                if(lastsibling != NULL){
+                    lastsibling->NextSibling = Child->NextSibling;
+                    Child->NextSibling = NULL;
+                    deletecascade(subtree);
+                }else{
+                    Parent->FirstChild = Child->NextSibling;
+                    Child->NextSibling = NULL;
+                    deletecascade(subtree);
+                }
+                find = 1;
+                break;
+            }else{
+                q_push(Child);
+                lastsibling = Child;
+                Child = Child->NextSibling;
+            }
+        }
+        if(find){
+            while (q_pop()){}
+            break;
+        }
+        lastsibling = NULL;
+        Parent = q_pop();
+    }
+    
+}
+
 
 PtrTreeNode InsertTreeNode(PtrTreeNode ChosedNode, int relation, int NodeNum, struct NodeClass NodeObject)
 {
@@ -112,51 +203,7 @@ int FindChildren(PtrTreeNode Parent, PtrTreeNode Children[]){
     
 }
 
-void InitalQueue(){
-    queue.head = 0;
-    queue.tail = -1;
-    queue.max_size = 20;
-    queue.cur_size = 0;
-}
 
-int is_full(){
-    if(queue.cur_size == queue.max_size){
-        return 1;
-    }else
-        return 0;
-}
-
-int is_empty(){
-    if(queue.cur_size == 0)
-    {
-        return 1;
-    }else{
-        return 0;
-    }
-}
-
-void q_push(PtrTreeNode node){
-    if(!is_full())
-    {
-        queue.tail = (queue.tail + 1)%queue.max_size;
-        queue.Q[queue.tail] = node;
-        queue.cur_size++;
-    }else{
-        printf("The space of Queue is run out!\n");
-    }
-}
-
-PtrTreeNode q_pop(){
-    if(!is_empty())
-    {
-        PtrTreeNode front = queue.Q[queue.head];
-        queue.head = (queue.head + 1)%queue.max_size;
-        queue.cur_size--;
-        return front;
-    }else{
-        return NULL;
-    }
-}
 
 
 void LevelOrderTravelsal(PtrTreeNode Root, void(*DrawChildren)(
@@ -314,9 +361,10 @@ PtrTreeNode TxtFile2Tree(char name[]){
 int main(void){
     PtrTreeNode Root;
     InitalQueue();
-    printf("%d %d\n",queue.max_size,queue.cur_size);
-    Root = BinaryFile2Tree("MapFile.txt");
-    printf("%s",Root->FirstChild->NextSibling->Content);
-
+    // printf("%d %d\n",queue.max_size,queue.cur_size);
+    Root = TxtFile2Tree("MapFile.txt");
+    // printf("%s",Root->FirstChild->NextSibling->Content);
+    DeleteTree(Root->FirstChild, Root);
+    Tree2TxtFile(Root, "AfterDeletion.txt");
     return 0;
 }

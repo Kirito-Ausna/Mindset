@@ -1,96 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<Map2Tree.h>
+#include"Map2Tree.h"
 #include<string.h>
-
-PtrTreeNode CreateTree(int NodeNum, struct NodeClass NodeObject){
-
-    PtrTreeNode root = (PtrTreeNode)malloc(sizeof(struct TreeNode));
-    strcpy(root->Content, "Text Here!");// Initially set to be empty
-    root->NodeObject = NodeObject;
-    root->NodeNumber = NodeNum;
-    root->FirstChild = NULL;
-    root->NextSibling = NULL;
-	return root;
-}
-
-PtrTreeNode LocateNode(double x, double y, PtrTreeNode root){
-    if(root == NULL){
-        return NULL;
-    }
-
-    struct NodeClass obj = root->NodeObject;
-//    printf("%lf %lf %lf %lf",obj.dx,obj.dx+obj.width,obj.dy,obj.dy+obj.height);
-    if((x>obj.dx)&&(x<obj.dx+obj.width)&&(y>obj.dy)&&(y<obj.dy+obj.height))
-        return root;
-
-    PtrTreeNode Node1 = LocateNode(x, y, root->FirstChild);
-    PtrTreeNode Node2 = LocateNode(x, y, root->NextSibling);
-
-    if(Node1 != NULL)
-        return Node1;
-    else if(Node2 != NULL)
-        return Node2;
-    else
-        return NULL;
-}
-
-void EditContent(PtrTreeNode node, char value[]){
-    strcpy(node->Content, value);
-}
-
-void EditCoordinate(PtrTreeNode node, double x, double y){
-    node->NodeObject.dx = x;
-    node->NodeObject.dx = y;
-}
-
-void FreeNode(PtrTreeNode node){
-    free(node);
-}
-
-void DeleteTree(PtrTreeNode subtree){
-    if(subtree == NULL){
-        return;
-    }
-    DeleteTree(subtree->FirstChild);
-    DeleteTree(subtree->NextSibling);
-    if(subtree != Root){
-        FreeNode(subtree);
-    }else{
-        EditContent(subtree,"");
-    }
-}
-
-PtrTreeNode InsertTreeNode(PtrTreeNode ChosedNode, int relation, int NodeNum, struct NodeClass NodeObject)
-{
-    if(relation == 0)// define inserting a child or next level node
-    {// insert a child
-        PtrTreeNode fisrtchild = ChosedNode->FirstChild;
-        ChosedNode->FirstChild = CreateTree(NodeNum,NodeObject);
-        ChosedNode->FirstChild->NextSibling = fisrtchild;
-        return ChosedNode->FirstChild;
-    }else{
-        while (ChosedNode->NextSibling != NULL)
-        {
-            ChosedNode = ChosedNode->NextSibling;
-        }
-        ChosedNode->NextSibling = CreateTree(NodeNum,NodeObject);
-        return ChosedNode->NextSibling;
-    }
-}
-
-int FindChildren(PtrTreeNode Parent, PtrTreeNode Children[]){
-    int ChildNum = 0;
-    PtrTreeNode Child = Parent->FirstChild;
-    while (Child)
-    {
-        Children[ChildNum] = Child;
-        ChildNum++;
-        Child = Child->NextSibling;
-    }
-    Child = Parent->FirstChild;
-    return ChildNum;
-}
 
 void InitalQueue(){
     queue.head = 0;
@@ -137,6 +48,162 @@ PtrTreeNode q_pop(){
         return NULL;
     }
 }
+
+PtrTreeNode CreateTree(int NodeNum, struct NodeClass NodeObject){
+
+    PtrTreeNode root = (PtrTreeNode)malloc(sizeof(struct TreeNode));
+    strcpy(root->Content, "");// Initially set to be empty
+    root->NodeObject = NodeObject;
+    root->NodeNumber = NodeNum;
+    root->FirstChild = NULL;
+    root->NextSibling = NULL;
+    Root = root;
+    return root;
+}
+
+PtrTreeNode LocateNode(double x, double y, PtrTreeNode root){
+    if(root == NULL){
+        return NULL;
+    }
+
+    struct NodeClass obj = root->NodeObject;
+    if(x>obj.dx&&x<obj.dx+obj.width&&y>obj.dy&&y<obj.dy+obj.height)
+        return root;
+
+    PtrTreeNode Node1 = LocateNode(x, y, root->FirstChild);
+    PtrTreeNode Node2 = LocateNode(x, y, root->NextSibling);
+
+    if(Node1 != NULL)
+        return Node1;
+    else if(Node2 != NULL)
+        return Node2;
+    else
+        return NULL;
+}
+
+void EditContent(PtrTreeNode node, char value[]){
+    if(node != NULL)
+        strcpy(node->Content, value);
+}
+
+void EditCoordinate(PtrTreeNode node, double x, double y){
+    if(node != NULL){
+        node->NodeObject.dx = x;
+        node->NodeObject.dx = y;
+    }
+}
+
+void FreeNode(PtrTreeNode node){
+    if(node != NULL){
+        free(node);
+    }
+}
+
+void deletecascade(PtrTreeNode firstChild){
+    if(firstChild == NULL){
+        return;
+    }
+    deletecascade(firstChild->FirstChild);
+    deletecascade(firstChild->NextSibling);
+    if(firstChild != Root){
+        FreeNode(firstChild);
+    }else{
+        EditContent(firstChild,"");
+    }
+}
+
+void DeleteTree(PtrTreeNode subtree, PtrTreeNode Root){
+    int find = 0;
+    if(subtree == NULL){
+        printf("No node to delete!");
+        return;
+    }
+    if(subtree == Root){
+        deletecascade(Root->FirstChild);
+    }
+    PtrTreeNode Parent = Root;
+    PtrTreeNode lastsibling = NULL;
+    while (Parent)
+    {
+        PtrTreeNode Child = Parent->FirstChild;
+        while (Child)
+        {
+            if(Child == subtree){
+                if(lastsibling != NULL){
+                    lastsibling->NextSibling = Child->NextSibling;
+                    Child->NextSibling = NULL;
+                    deletecascade(subtree);
+                }else{
+                    Parent->FirstChild = Child->NextSibling;
+                    Child->NextSibling = NULL;
+                    deletecascade(subtree);
+                }
+                find = 1;
+                break;
+            }else{
+                q_push(Child);
+                lastsibling = Child;
+                Child = Child->NextSibling;
+            }
+        }
+        if(find){
+            while (q_pop()){}
+            break;
+        }
+        lastsibling = NULL;
+        Parent = q_pop();
+    }
+    
+}
+
+
+PtrTreeNode InsertTreeNode(PtrTreeNode ChosedNode, int relation, int NodeNum, struct NodeClass NodeObject)
+{
+    if(ChosedNode != NULL){
+        if(relation == 0)// define inserting a child or next level node
+        {// insert a child
+            PtrTreeNode fisrtchild = ChosedNode->FirstChild;
+            ChosedNode->FirstChild = CreateTree(NodeNum,NodeObject);
+            ChosedNode->FirstChild->NextSibling = fisrtchild;
+            return ChosedNode->FirstChild;
+        }else{// insert a sibling
+            while (ChosedNode->NextSibling != NULL)
+            {
+                ChosedNode = ChosedNode->NextSibling;
+            }
+            if(ChosedNode != Root)
+            {
+                ChosedNode->NextSibling = CreateTree(NodeNum,NodeObject);
+                return ChosedNode->NextSibling;
+            }else{
+                return NULL; // Can't insert a sibling for the Root
+            }
+        }
+    }else{
+        return NULL;// insertion failed
+    }
+}
+
+int FindChildren(PtrTreeNode Parent, PtrTreeNode Children[]){
+    int ChildNum = 0;
+    PtrTreeNode Child;
+    if(Parent != NULL){
+        Child = Parent->FirstChild;
+        while (Child)
+        {
+            Children[ChildNum] = Child;
+            ChildNum++;
+            Child = Child->NextSibling;
+        }
+        // Child = Parent->FirstChild;
+        return ChildNum;
+    }else{
+        return -1;// Find failed, Parent doesn't exit.
+    }
+    
+}
+
+
 
 
 void LevelOrderTravelsal(PtrTreeNode Root, void(*DrawChildren)(
@@ -204,7 +271,7 @@ PtrTreeNode BinaryFile2Tree(char name[]){
             *(Root->FirstChild) = Children[0];
             q_push(Root->FirstChild);
             PtrTreeNode Child = Root->FirstChild;
-            int i=1;
+            int i;
             for(i = 1;i<num_children;i++){
                 Child->NextSibling = (PtrTreeNode)malloc(sizeof(struct TreeNode));
                 q_push(Child->NextSibling);
@@ -217,14 +284,13 @@ PtrTreeNode BinaryFile2Tree(char name[]){
         }
         Root = q_pop();
     }
-    fclose(fout);
+    fclose(fout); // don't forget fclose !
     return R;
 }
 
 void Tree2TxtFile(PtrTreeNode Root, char name[]){
     FILE* fin = fopen(name, "w+");
     struct TreeNode Children[20];
-//    fprintf(fin, "Here is test save\n");
     fprintf(fin, "%d %lf %lf %lf %lf %d %s ",Root->NodeNumber,
     Root->NodeObject.height, Root->NodeObject.width, Root->NodeObject.dx, Root->NodeObject.dy,
     Root->NodeObject.color,Root->Content);
@@ -240,7 +306,7 @@ void Tree2TxtFile(PtrTreeNode Root, char name[]){
             Child = Child->NextSibling;
         }
         fprintf(fin, "%d\n", num_child);
-        int i=0;
+        int i;
         for(i=0;i<num_child;i++){
             fprintf(fin, "%d %lf %lf %lf %lf %d %s\n",Children[i].NodeNumber,
             Children[i].NodeObject.height, Children[i].NodeObject.width, Children[i].NodeObject.dx, Children[i].NodeObject.dy,
@@ -248,9 +314,7 @@ void Tree2TxtFile(PtrTreeNode Root, char name[]){
         }
         Root = q_pop();
     }
-//    add by shengnv 2021.6.19 
-//	update reason: forget fclose, can not save successfully
-    fclose(fin);
+    fclose(fin); // don't forget fclose !
 }
 
 PtrTreeNode TxtFile2Tree(char name[]){
@@ -268,7 +332,7 @@ PtrTreeNode TxtFile2Tree(char name[]){
         int num_children;
         fscanf(fout, "%d", &num_children);
         if(num_children != 0){
-        	int i=0;
+           int i;
            for(i=0;i<num_children;i++){
             fscanf(fout, "%d %lf %lf %lf %lf %d %s",&Children[i].NodeNumber,
             &Children[i].NodeObject.height, &Children[i].NodeObject.width, &Children[i].NodeObject.dx, &Children[i].NodeObject.dy,
@@ -290,7 +354,17 @@ PtrTreeNode TxtFile2Tree(char name[]){
         }
         Root = q_pop();
     }
-    printf("TxtFile2Tree End here\n");
-    fclose(fout);
+    fclose(fout);// Don't forget fclose !
     return R;
+}
+
+int main(void){
+    PtrTreeNode Root;
+    InitalQueue();
+    // printf("%d %d\n",queue.max_size,queue.cur_size);
+    Root = TxtFile2Tree("MapFile.txt");
+    // printf("%s",Root->FirstChild->NextSibling->Content);
+    DeleteTree(Root->FirstChild, Root);
+    Tree2TxtFile(Root, "AfterDeletion.txt");
+    return 0;
 }

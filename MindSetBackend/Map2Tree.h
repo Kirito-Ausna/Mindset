@@ -40,7 +40,7 @@ void EditContent(PtrTreeNode node, char value[]);
 void EditCoordinate(PtrTreeNode node, double x, double y);
 // Delete a node on cascade
 void FreeNode(PtrTreeNode node);//node points to the TreeNode which is empty
-void DeleteTree(PtrTreeNode subtree);//Root can't be deleted, only set content to null
+void DeleteTree(PtrTreeNode subtree, PtrTreeNode Root);//Root can't be deleted, only set content to null
 
 // Insert a Tree Node and get its pointer for the sake of updating simplicity
 PtrTreeNode InsertTreeNode(PtrTreeNode ChosedNode, int relation, int NodeNum, struct NodeClass NodeObject);

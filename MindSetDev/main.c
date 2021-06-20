@@ -27,11 +27,12 @@ void drawMenu()
 		"退出                        |Ctrl-E"};
 	static char * menuListExport[] = {"   |导入|     ",
 		"文件（二进制）",
-		"文件 （文本）",
+		"文件 （文本）", 
 		};
 	static char * menuListHelp[] = {"    |帮助|  ",
 		"使用手册",
-		"关于MindSet"};
+		"关于MindSet",
+		"插入背景图"};
 	static char * selectedLabel = NULL;
 
 	double fH = GetFontHeight();//fH字体高度 
@@ -152,9 +153,33 @@ void DrawChildren1(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 
 void DrawChildren2(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 {
+	
 }
 void DrawChildren3(PtrTreeNode Parent,int ChildNum,PtrTreeNode Children[])
 {
+//	static char memoroot[80]="Click To Start"; //输入提示
+//	if(Parent==NULL)//draw the root
+//	{
+//		SetPenSize(3);
+//		SetPenColor("Gray");
+//		MovePen(root->NodeObject.dx,root->NodeObect.dy)
+//		DrawLine(1.4,0);
+//		drawLabel(root->NodeObject.dx,root->NodeObject.dy,root->Content);
+//	}
+//	else if(ChildNum==0);
+//    else//draw the children
+//	{
+//		double fatherx=Parent->NodeObject.dx+Parent->NodeObject.width+0.1;
+//	    double fatherydw=Parent->NodeObject.dy+fH+ChildNum/2*h*1.8;
+//	    MovePen(Parent->NodeObject.dx+Parent->NodeObject.width,Parent->NodeObject.dy+Parent->NodeObject.height);
+//	    SetPenSize(3);
+//		SetPenColor("Gray");
+//		
+//		for(i=0;i<ChildNum-1;i++)
+//		{
+//			int r=2*GetCurrentX()
+//		}
+//	}
 }
 
 //切换选择模式的总函数 
@@ -212,18 +237,18 @@ void KeyboardEventProcess(int key, int event)
 					{
 						ChildrenNum=FindChildren(TargetNode,Children);
 	    	            yf = InsertTreeNode(TargetNode,0,idnum,TargetNode->NodeObject);
-	    	            LevelOrderTravelsal(root,DrawChildren1);
-						/*switch(switch_button) 
+//	    	            LevelOrderTravelsal(root,DrawChildren1);
+						switch(switch_button) 
 		    	        {
 		    	            case 1:LevelOrderTravelsal(root, DrawChildren1);break;
-		    	            //case 2:LevelOrderTravelsal(root, DrawChildren2);break;
-		    	            //case 3:LevelOrderTravelsal(root, DrawChildren3);break;
+		    	            case 2:LevelOrderTravelsal(root, DrawChildren2);break;
+		    	            case 3:LevelOrderTravelsal(root, DrawChildren3);break;
 		    	        }
-		    	        idnum++;*/
+		    	        idnum++;
 		    	        drawLabel(winwidth/1.5,winheight/22,"Hello World!");
 		    	    }else{
 		    	    	char toolman[10];
-						sprintf(toolman,"Sorry.Do Not Find the Target.(mouse in %lf %lf)",mouse_x,mouse_y);
+						sprintf(toolman,"Sorry.Do Not Find the Target.(Mouse in %lf %lf)",mouse_x,mouse_y);
 						drawLabel(winwidth/1.5,winheight/22,toolman);
 		    	    }
 		        }
@@ -239,8 +264,8 @@ void KeyboardEventProcess(int key, int event)
 	    	            switch(switch_button) 
 		    	        {
 		    	            case 1:LevelOrderTravelsal(root, DrawChildren1);break;
-							//case 2:LevelOrderTravelsal(root, DrawChildren2);break;
-		    	            //case 3:LevelOrderTravelsal(root, DrawChildren3);break;
+							case 2:LevelOrderTravelsal(root, DrawChildren2);break;
+		    	            case 3:LevelOrderTravelsal(root, DrawChildren3);break;
 		    	        }
 			            idnum++;
 			        }
@@ -259,8 +284,8 @@ void KeyboardEventProcess(int key, int event)
 			    		switch(switch_button) 
 		    	        {
 		    	            case 1:LevelOrderTravelsal(root, DrawChildren1);break;
-		    	            //case 2:LevelOrderTravelsal(root, DrawChildren2);break;
-		    	            //case 3:LevelOrderTravelsal(root, DrawChildren3);break;
+		    	            case 2:LevelOrderTravelsal(root, DrawChildren2);break;
+		    	            case 3:LevelOrderTravelsal(root, DrawChildren3);break;
 		    	        }
 			    	}
 			    }
@@ -269,16 +294,16 @@ void KeyboardEventProcess(int key, int event)
 //				double move_x=GetCurrentX();
 //	            double move_y=GetCurrentY();
 //	            drawLabel(winwidth/1.5,winheight/22,"Here You are");
-				TargetNode=LocateNode(mouse_x,mouse_y,root);//temporary varible
-				if(TargetNode == NULL){
-					char toolman[10];
-					sprintf(toolman,"%lf %lf",mouse_x,mouse_y);
-					drawLabel(winwidth/1.5,winheight/22,toolman);
-					printf("It's a test");
-				}else{
-				EditContent(TargetNode,memochild);
-				drawLabel(winwidth/1.5,winheight/22,"Success!Go On~");
-			    }
+//				TargetNode=LocateNode(mouse_x,mouse_y,root);//temporary varible
+//				if(TargetNode == NULL){
+//					char toolman[10];
+//					sprintf(toolman,"%lf %lf",mouse_x,mouse_y);
+//					drawLabel(winwidth/1.5,winheight/22,toolman);
+//					printf("It's a test");
+//				}else{
+//				EditContent(TargetNode,memochild);
+//				drawLabel(winwidth/1.5,winheight/22,"Success!Go On~");
+//			    }
 			}
 			break;
 	    default:

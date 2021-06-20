@@ -203,6 +203,7 @@ void Tree2BinaryFile(PtrTreeNode Root, char name[]){
         }
         Root = q_pop();
     }
+    fclose(fin);
 }
 
 PtrTreeNode BinaryFile2Tree(char name[]){
@@ -236,7 +237,7 @@ PtrTreeNode BinaryFile2Tree(char name[]){
         }
         Root = q_pop();
     }
-    fclose(fout);
+    fclose(fout); // don't forget fclose !
     return R;
 }
 
@@ -266,6 +267,7 @@ void Tree2TxtFile(PtrTreeNode Root, char name[]){
         }
         Root = q_pop();
     }
+    fclose(fin); // don't forget fclose !
 }
 
 PtrTreeNode TxtFile2Tree(char name[]){
@@ -305,6 +307,7 @@ PtrTreeNode TxtFile2Tree(char name[]){
         }
         Root = q_pop();
     }
+    fclose(fout);// Don't forget fclose !
     return R;
 }
 
